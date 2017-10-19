@@ -1,0 +1,75 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.3'
+        // gradle 3.3 兼容的maven-gradle-plugin版本为 1.5
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.6'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+
+        // aar文件存放目录
+        flatDir {
+            dirs 'libs'
+        }
+
+        //Maven URL地址
+        maven {
+            url "http://mvn.gt.igexin.com/nexus/content/repositories/releases/"
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+ext {
+    minSdkVersion = 14
+    targetSdkVersion = 25
+    compileSdkVersion = 25
+    buildToolsVersion = '25.0.2'
+    //support and test
+    supportLibraryVersion = '25.3.1'
+    guavaVersion = '18.0'
+    junitVersion = '4.12'
+    mockitoVersion = '1.10.19'
+    powerMockito = '1.6.2'
+    hamcrestVersion = '1.3'
+    runnerVersion = '0.5'
+    rulesVersion = '0.5'
+    espressoVersion = '2.2.2'
+    okhttpVersion = "2.3.+"
+    multidexVersion = "1.0.+"
+    fastjsonVersion = "1.1.+"
+    systembartintVersion = "1.0.+"
+    hirondelleDate4jVersion = "1.5.1"
+    calligraphyVersion = "2.1.+"
+    htrecycleviewVersion = "0.0.1"
+    hteventbusVersion = "0.0.1-SNAPSHOT"
+    htviewpagerwithindicatorVersion = "0.0.3-SNAPSHOT"
+    htlogVersion = "0.0.1"
+    htrefreshRecyclerviewVersion = "1.1.0"
+    htglideVersion = "0.0.1-SNAPSHOT"
+    hthttp2Version = "0.1.1-SNAPSHOT"
+    htShareVersion = "0.0.3-SNAPSHOT"
+    htrouterDispatchVersion = "0.1.0"
+    htrouterDispatchProcessVersion = "0.1.0"
+    candyNetworkClientVersion = "0.0.5-SNAPSHOT"
+    switchButtonVersion = "1.4.4"
+    htimagepicker = "0.0.6-SNAPSHOT"
+    htqrcode = "1.1.0-SNAPSHOT"
+    newsfeedsVersion = "1.2"
+    sdkVersionName = "1.2"
+    sdkVersionCode = 1
+}

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/action_bar_height">
+
+        <TextView
+            android:id="@+id/tv_left"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="left|center_vertical"
+            android:drawableLeft="@drawable/selector_navi_back"
+            android:gravity="center_vertical"
+            android:minWidth="50dp"
+            android:paddingLeft="@dimen/navigation_left_padding"
+            android:textColor="@color/selector_btn_text_color_white"
+            android:textSize="@dimen/text_size_m"/>
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:layout_centerInParent="true"
+            android:maxLines="1"
+            android:maxWidth="220dp"
+            android:textColor="@color/text_title_lv1_color"
+            android:textSize="@dimen/text_size_19"/>
+        <View
+            android:id="@+id/bottom_divider"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/divider_thick_1px"
+            android:layout_alignParentBottom="true"
+            android:background="@color/news_list_line_under_indicator"
+            />
+    </RelativeLayout>
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+    </FrameLayout>
+</LinearLayout>
+

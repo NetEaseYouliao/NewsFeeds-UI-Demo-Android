@@ -1,0 +1,86 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
+    defaultConfig {
+        applicationId "com.netease.youliao.uidemo"
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+        versionCode 1
+        versionName "1.2"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            //设置支持的SO库架构
+            abiFilters "armeabi", "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
+        }
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            shrinkResources false
+            zipAlignEnabled true
+        }
+    }
+
+    productFlavors {
+
+        Online {
+            applicationId "com.netease.youliao.uidemo"
+            manifestPlaceholders = [YOULIAO_CHANNEL_VALUE: "Online",
+                                    AMAP_API_KEY         : "a9d2948a7fc35e57ddce79d9129cf093",
+                                    GETUI_APP_ID         : "I0G0KdseXB7NqZaZbZYfpA",
+                                    GETUI_APP_KEY        : "1oF1UF2IYo5Kx6rFGEPJG4",
+                                    GETUI_APP_SECRET     : "kOKsNhxpga5suGKVrdkpv7"]
+            buildConfigField("String", "PROJECT_KEY", "\"f61ee58affc49b7ffe9cadb85a3e30e2\"")
+            buildConfigField("String", "APP_KEY", "\"3c11d60d903e49d5a47ad2a58bb0db97\"")
+            buildConfigField("String", "APP_SECRET", "\"ca5137e40b874abd893e762f1d53d839\"")
+            buildConfigField("int", "SERVER_TYPE", "0")
+        }
+
+    }
+
+    // This is important, it will run lint checks but won't abort build
+    lintOptions {
+        abortOnError false
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    testCompile 'junit:junit:4.12'
+
+
+    // data-sdk依赖库
+    compile 'com.alibaba:fastjson:1.2.8'
+    compile 'com.getui:sdk:2.11.1.0'
+    // ui-sdk依赖库
+    compile "com.readystatesoftware.systembartint:systembartint:1.0.+"
+    compile 'com.github.bumptech.glide:glide:4.0.0-RC1'
+    compile 'org.greenrobot:eventbus:3.0.0'
+    compile "com.android.support:recyclerview-v7:25.3.1"
+
+    // aar文件依赖data-sdk & ui-sdk
+    compile "com.netease.youliao:newsfeeds-data:$rootProject.newsfeedsVersion@aar"
+    compile "com.netease.youliao:newsfeeds-ui:$rootProject.newsfeedsVersion@aar"
+
+    // 远程依赖数据sdk & ui sdk
+//    compile "com.netease.youliao:newsfeeds-data:$rootProject.newsfeedsVersion"
+//    compile "com.netease.youliao:newsfeeds-ui:$rootProject.newsfeedsVersion"
+    // 定位 sdk
+    compile 'com.amap.api:location:latest.integration'
+    // 网易云埔
+    compile 'com.netease.nis.plugin:bugrpt:latest.release'//如果指定版本号接入的，升级版本后请clean下工程
+}
