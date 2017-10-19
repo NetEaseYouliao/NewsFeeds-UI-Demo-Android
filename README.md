@@ -1,5 +1,4 @@
 # Android UI SDK 接入文档
-
 ## UI SDK 概述
 
 网易有料 NewsFeeds UI SDK 封装了信息流的核心视图控件，方便第三方应用快速的集成并实现内容分发功能。UI SDK兼容Android 14+，UI Demo兼容Android 14+。
@@ -81,7 +80,7 @@ compile 'com.alibaba:fastjson:1.2.8'
 compile 'com.getui:sdk:2.11.1.0'
 ```
 
-data-sdk依赖了如下第三方库：
+ui-sdk依赖了如下第三方库：
 
 ```java
 compile "com.readystatesoftware.systembartint:systembartint:1.0.+"
@@ -97,17 +96,17 @@ dependencies {
     // 新建工程时自动生成
     compile fileTree(include: ['*.jar'], dir: 'libs')
     ...
-   // data-sdk依赖库
-   	compile 'com.alibaba:fastjson:1.2.8'
-	compile 'com.getui:sdk:2.11.1.0'
-	// ui-sdk依赖库
-	compile "com.readystatesoftware.systembartint:systembartint:1.0.+"
-	compile 'com.github.bumptech.glide:glide:4.0.0-RC1'
-	compile 'org.greenrobot:eventbus:3.0.0'
-	compile "com.android.support:recyclerview-v7:25.3.1"
-	// aar文件依赖data-sdk & ui-sdk
-  	compile 'com.netease.youliao:newsfeeds-data:x.x@aar'
-	compile 'com.netease.youliao:newsfeeds-ui:x.x@aar'
+    // data-sdk依赖库
+    compile 'com.alibaba:fastjson:1.2.8'
+    compile 'com.getui:sdk:2.11.1.0'
+    // ui-sdk依赖库
+    compile "com.readystatesoftware.systembartint:systembartint:1.0.+"
+    compile 'com.github.bumptech.glide:glide:4.0.0-RC1'
+    compile 'org.greenrobot:eventbus:3.0.0'
+    compile "com.android.support:recyclerview-v7:25.3.1"
+    // aar文件依赖data-sdk & ui-sdk
+    compile 'com.netease.youliao:newsfeeds-data:x.x@aar'
+    compile 'com.netease.youliao:newsfeeds-ui:x.x@aar'
 }
 ```
 
@@ -159,11 +158,11 @@ NNewsFeedsUI 为ui-sdk主入口，提供多个Fragment的实例化调用。
  */
 public static NNFeedsFragment createFeedsFragment(OnFeedsCallback onFeedsCallback, Object extraData)
 ```
-其中 extraData 为用户传入的额外参数，便于用户标识当前实例，该参数会在onFeedsCallback回调中回传。
+其中 extraData 为用户自定义数据，该参数会在onFeedsCallback回调中回传。
 
 ==注意==：提供两种模式
 
-- 1种未自定义回调，则所有页面已经整合到一起，及文章详情页面、图集页面、新闻正文图片浏览页面都已封装
+- 第一种，未自定义回调，则所有页面已经整合到一起，及文章详情页面、图集页面、新闻正文图片浏览页面都已封装
 
 ```java
 /**
@@ -172,13 +171,14 @@ public static NNFeedsFragment createFeedsFragment(OnFeedsCallback onFeedsCallbac
 private void initFeedsByOneStep() {
     FragmentManager fm = getSupportFragmentManager();
     FragmentTransaction ft = fm.beginTransaction();
+    // 回调设置为null，表示使用SDK内部回调
     mFeedsFragment = NNewsFeedsUI.createFeedsFragment(null, null);
     ft.replace(R.id.fragment_container, mFeedsFragment);
     ft.commitAllowingStateLoss();
 }
 ```
 
-- 另外一种是实现了自定义回调，那么用户在点击新闻列表的时候跳转到用户回调，由用户自定义页面跳转
+- 第二种，实现自定义回调，那么用户在点击新闻列表的时候跳转到用户回调，由用户自定义页面跳转
 
 ```java
 /**
@@ -193,7 +193,7 @@ private void initFeedsStepByStep() {
 }
 
 /**
- * 第二步：可选，为信息流主页 NNFeedsFragment 设置点击事件回调；如不设置，使用SDK内部的默认回调
+ * 第二步：为信息流主页 NNFeedsFragment 设置点击事件回调
  */
 private class FeedsCallbackSample extends NNFOnFeedsCallback {
     @Override
@@ -231,7 +231,7 @@ private class FeedsCallbackSample extends NNFOnFeedsCallback {
 public abstract void onNewsClick(Context context, NNFNewsInfo newsInfo, Object extraData);
 ```
  
- 注意这里的extraData是初始化NNFeedsFragment实例时，传入的用户参数。
+ 注意这里的extraData是初始化NNFeedsFragment实例时，传入的用户自定义数据。
  
  若用户未实现该回调，则SDK会根据新闻的infoType自动跳转到对应的默认展示页面。
  
@@ -251,9 +251,7 @@ public abstract void onNewsClick(Context context, NNFNewsInfo newsInfo, Object e
  * @param extraData         额外参数
  * @return
  */
-public static NNFArticleWebFragment createArticleFragment(NNFNewsInfo newsInfo, NNFOnArticleCallback onArticleCallback, Object extraData) {
-    return NNFArticleWebFragment.newInstance(newsInfo, onArticleCallback, extraData);
-}
+public static NNFArticleWebFragment createArticleFragment(NNFNewsInfo newsInfo, NNFOnArticleCallback onArticleCallback, Object extraData) 
 ```
 用户选择自己创建新闻详情页面时，可以通过该接口创建新闻详情视图实例，其中newsInfo为当前新闻对应新闻列表中的数据源，onArticleCallback为自定义回调，extraData为用户传入的额外参数。
 
@@ -285,7 +283,7 @@ private void initArticleStepByStep() {
     FragmentTransaction ft = fm.beginTransaction();
     NNFArticleWebFragment articleWebFragment = NNewsFeedsUI.createArticleFragment(mNewsInfo, new NNFOnArticleCallback() {
         /**
-         * 第二步：可选，为文章类展示页 NNFArticleWebFragment 设置点击事件回调；如不设置，使用SDK内部的默认回调
+         * 第二步：为文章类展示页 NNFArticleWebFragment 设置点击事件回调；
          */
 
         @Override
@@ -376,7 +374,8 @@ public abstract void onWebImageClick(Context context, String infoId, int index, 
 
 ---
 
-#### 文章类新闻详情加载成功
+-文章类新闻详情加载成功
+
 ```java
 /**
  * 文章类新闻加载成功
@@ -390,7 +389,8 @@ public abstract void onArticleLoaded(NNFNewsInfo newsInfo, Object extraData);
 
 ---
 
-#### 详情页面跳转到报错页面的回调
+- 详情页面跳转到报错页面的回调
+
 ```java
 /**
  * 举报中
@@ -404,7 +404,8 @@ public void onIssueReporting(String issueDescription, Object extraData)
 
 ---
 
-#### 详情页面跳转到报错完成返回到主页的回调
+- 详情页面跳转到报错完成返回到主页的回调
+
 ```java
 /**
  * 举报完成
@@ -460,7 +461,7 @@ public void initGalleryStepByStep(NNFNewsInfo newsInfo) {
     FragmentTransaction ft = fm.beginTransaction();
 
     /**
-     * 第二步：可选，为图集展示页 NNFPicSetGalleryFragment 设置点击事件回调；如不设置，使用SDK内部的默认回调
+     * 第二步：为图集展示页 NNFPicSetGalleryFragment 设置点击事件回调；
      */
     NNFOnPicSetGalleryCallback onPicSetGalleryCallback = new NNFOnPicSetGalleryCallback() {
         @Override
@@ -473,6 +474,9 @@ public void initGalleryStepByStep(NNFNewsInfo newsInfo) {
 
         @Override
         public void onBackClick(Context context) {
+            /**
+             * 第四步：设置图集展示页左上角返回按钮点击后的行为
+             */
             SamplePicSetGalleryActivity.this.finish();
         }
     };
@@ -520,6 +524,7 @@ public abstract void onBackClick(Context context);
 ---
 
 #### 创建文章类新闻正文图片集展示页NNFArticleGalleryFragment实例
+
 ```java
 /**
  * 展示文章类新闻正文中的图片集
@@ -565,12 +570,14 @@ private void initGalleryStepByStep(int startIndex, NNFImageInfo[] imageInfos, St
     FragmentTransaction ft = fm.beginTransaction();
 
     /**
-     * 第二步：可选，NNFArticleGalleryFragment 设置点击事件回调；如不设置，使用SDK内部的默认回调
+     * 第二步：NNFArticleGalleryFragment 设置点击事件回调；
      */
     NNFOnArticleGalleryCallback onArticleGalleryCallback = new NNFOnArticleGalleryCallback() {
         @Override
         public void onPicClick(Context context, NNFImageInfo imageInfo, Object extraData) {
-            // 点击图片返回
+            /**
+             * 第三步：设置图片点击行为
+             */
             SampleArticleGalleryActivity.this.finish();
         }
     };

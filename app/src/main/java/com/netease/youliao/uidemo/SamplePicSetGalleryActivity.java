@@ -74,7 +74,7 @@ public class SamplePicSetGalleryActivity extends BaseBlankActivity {
         FragmentTransaction ft = fm.beginTransaction();
 
         /**
-         * 第二步：可选，为图集展示页 NNFPicSetGalleryFragment 设置点击事件回调；如不设置，使用SDK内部的默认回调
+         * 第二步：为图集展示页 NNFPicSetGalleryFragment 设置点击事件回调；
          */
         NNFOnPicSetGalleryCallback onPicSetGalleryCallback = new NNFOnPicSetGalleryCallback() {
             @Override
@@ -87,6 +87,9 @@ public class SamplePicSetGalleryActivity extends BaseBlankActivity {
 
             @Override
             public void onBackClick(Context context) {
+                /**
+                 * 第四步：设置图集展示页左上角返回按钮点击后的行为
+                 */
                 SamplePicSetGalleryActivity.this.finish();
             }
         };

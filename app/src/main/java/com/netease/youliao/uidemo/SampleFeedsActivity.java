@@ -87,7 +87,7 @@ public class SampleFeedsActivity extends BaseNavigationBarActivity {
     }
 
     /**
-     * 第二步：可选，为信息流主页 NNFeedsFragment 设置点击事件回调；如不设置，使用SDK内部的默认回调
+     * 第二步：为信息流主页 NNFeedsFragment 设置点击事件回调；
      */
     private class FeedsCallbackSample extends NNFOnFeedsCallback {
         @Override

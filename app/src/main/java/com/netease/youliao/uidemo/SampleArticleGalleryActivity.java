@@ -84,12 +84,14 @@ public class SampleArticleGalleryActivity extends BaseBlankActivity {
         FragmentTransaction ft = fm.beginTransaction();
 
         /**
-         * 第二步：可选，NNFArticleGalleryFragment 设置点击事件回调；如不设置，使用SDK内部的默认回调
+         * 第二步：NNFArticleGalleryFragment 设置点击事件回调；
          */
         NNFOnArticleGalleryCallback onArticleGalleryCallback = new NNFOnArticleGalleryCallback() {
             @Override
             public void onPicClick(Context context, NNFImageInfo imageInfo, Object extraData) {
-                // 点击图片返回
+                /**
+                 * 第三步：设置图片点击行为
+                 */
                 SampleArticleGalleryActivity.this.finish();
             }
         };
