@@ -1,6 +1,6 @@
 # Android UI SDK 接入文档
 
-为便于用户接入我们的 UI SDK，我们提供了 UI SDK 集成的演示Demo，用户可参考Demo源码及文档使用我们的 UI SDK。
+为便于用户接入我们的 UI SDK，我们提供集成了 UI SDK 的演示Demo，用户可参考Demo源码及文档使用我们的 UI SDK。
 
 [NewsFeeds-Demo-Android源码](https://github.com/NetEaseYouliao/NewsFeeds-Demo-Android)
 
@@ -73,7 +73,7 @@ compile 'com.netease.youliao:newsfeeds-ui:1.2+'
 allprojects {
     repositories {
         jcenter()
-        
+
         // 添加aar所在目录
         flatDir {
             dirs 'libs'
@@ -289,13 +289,13 @@ NNFOnFeedsCallback为回调抽象类，提供信息流主页交互事件回调�
  */
 public abstract void onNewsClick(Context context, NNFNewsInfo newsInfo, Object extraData);
 ```
- 
+
  注意这里的extraData是初始化NNFeedsFragment实例时，传入的用户自定义数据。
- 
+
  若用户未实现该回调，则SDK会根据新闻的infoType自动跳转到对应的默认展示页面。
- 
+
  若用户实现该回调，则跳转到用户回调。
- 
+
 ---
 
 #### 创建文章类新闻展示页NNFArticleWebFragment实例
@@ -309,7 +309,7 @@ public abstract void onNewsClick(Context context, NNFNewsInfo newsInfo, Object e
  * @param extraData         用户自定义数据
  * @return
  */
-public static NNFArticleWebFragment createArticleFragment(NNFNewsInfo newsInfo, NNFOnArticleCallback onArticleCallback, Object extraData) 
+public static NNFArticleWebFragment createArticleFragment(NNFNewsInfo newsInfo, NNFOnArticleCallback onArticleCallback, Object extraData)
 ```
 用户选择自己创建新闻详情页面时，可以通过该接口创建新闻详情视图实例，其中newsInfo为当前新闻对应新闻列表中的数据源，onArticleCallback为自定义回调，extraData 为用户自定义数据，该参数会在onArticleCallback回调中回传。
 
@@ -486,7 +486,7 @@ public void onIssueReporting(String issueDescription, Object extraData)
  *
  * @param extraData 用户自定义数据
  */
-public void onIssueReportFinished(Object extraData) 
+public void onIssueReportFinished(Object extraData)
 ```
 
 报错操作结束后触发该回调。
@@ -702,9 +702,9 @@ public void markNewsRead(String infoId, int adapterPosition)
 ```
 
  使用SDK整合的View，无需调用该接口；
- 
+
  用户自定义跳转页面，需在新闻详情加载成功后，将新闻标记为已读，并主动调用该接口，刷新新闻列表的已读状态。其中infoId为当前新闻的ID，adapterPos为当前新闻在新闻列表适配器中的position。
- 
+
 ---
 
 #### 强制刷新当前列表
