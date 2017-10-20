@@ -69,8 +69,8 @@ ext {
     switchButtonVersion = "1.4.4"
     htimagepicker = "0.0.6-SNAPSHOT"
     htqrcode = "1.1.0-SNAPSHOT"
-    newsfeedsDataVersion = "1.2"
-    newsfeedsUIVersion = "1.2.1"
+    newsfeedsDataVersion = "1.2+"
+    newsfeedsUIVersion = "1.2+"
     sdkVersionName = "1.2"
     sdkVersionCode = 1
 }
