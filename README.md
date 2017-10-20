@@ -1,4 +1,9 @@
 # Android UI SDK 接入文档
+
+为便于用户接入我们的 UI SDK，我们提供了 UI SDK 集成的演示Demo，用户可参考Demo源码及文档使用我们的 UI SDK。
+
+[NewsFeeds-Demo-Android源码](https://github.com/NetEaseYouliao/NewsFeeds-Demo-Android)
+
 ## UI SDK 概述
 
 网易有料 NewsFeeds UI SDK 封装了信息流的核心视图控件，方便第三方应用快速的集成并实现内容分发功能。UI SDK兼容Android 14+，UI Demo兼容Android 14+。
@@ -50,6 +55,14 @@ allprojects {
 compile 'com.netease.youliao:newsfeeds-data:x.x'
 compile 'com.netease.youliao:newsfeeds-ui:x.x'
 ```
+
+为了自动升级到最新的sdk，建议写成下面的形式：
+
+```java
+compile 'com.netease.youliao:newsfeeds-data:1.2+'
+compile 'com.netease.youliao:newsfeeds-ui:1.2+'
+```
+
 - aar本地依赖
 
 第一步，导入aar包。在工程app结构下新建libs目录，同时将我们提供的`newsfeeds-sdk-x.x.aar`和`newsfeeds-ui-x.x.aar`文件复制到当前libs目录下
@@ -140,6 +153,36 @@ setCacheEnabled | cacheEnabled | boolean | 是否开启新闻正文文本和图�
 setMaxCacheTime | maxCacheTime | long | 配置新闻正文文本和图片最大缓存时长, 单位毫秒，默认7天
 setLogLevel | logLevel | int | Android Studio等开发工具的 控制台Log等级，指定哪些日志需要输出
 
+### 3. 混淆
+
+若您的App开启了混淆，请为我们的SDK添加下述混淆规则
+
+
+```java
+# 网易有料 - 信息流SDK
+-keep class com.netease.youliao.newsfeeds.**{*;}
+```
+
+由于我们的data-sdk内部依赖了腾讯广点通和个推，因此，混淆时也需要添加如下混淆规则：
+
+```java
+# 腾讯广点通
+-keep class com.qq.e.** {
+    public protected *;
+}
+-keep class android.support.v4.app.NotificationCompat**{
+    public *;
+}
+# 个推
+-dontwarn com.igexin.**
+-keep class com.igexin.** { *; }
+-keep class org.json.** { *; }
+-keep public class * extends com.igexin.sdk.GTIntentService
+
+-keep class android.support.v4.app.NotificationCompat { *; }
+-keep class android.support.v4.app.NotificationCompat$Builder { *; }
+```
+
 ## ui-sdk接口说明
 
 ### ui-sdk主入口
@@ -153,12 +196,26 @@ NNewsFeedsUI 为ui-sdk主入口，提供多个Fragment的实例化调用。
  * 信息流主页，提供频道切换和新闻列表的默认实现
  *
  * @param onFeedsCallback 回调
- * @param extraData       额外参数
+ * @param extraData       用户自定义数据
  * @return
  */
 public static NNFeedsFragment createFeedsFragment(OnFeedsCallback onFeedsCallback, Object extraData)
 ```
 其中 extraData 为用户自定义数据，该参数会在onFeedsCallback回调中回传。
+
+==注意==：Activity配置
+
+由于NNFeedsFragment包含视频播放功能，视频播放支持横屏播放，为确保视频切换到横屏时保留页面状态，请按照如下示例在AndroidManifest.xml中配置NNFeedsFragment依附的Activity的configChanges属性：
+
+```java
+<activity
+    android:name=".SampleFeedsActivity"
+    // 设置后，切屏不会重新调用各个生命周期，只会执行onConfigurationChanged方法
+    android:configChanges="orientation|screenSize|keyboardHidden"
+    android:launchMode="singleTask"
+    android:screenOrientation="portrait">
+</activity>
+```
 
 ==注意==：提供两种模式
 
@@ -209,14 +266,16 @@ private class FeedsCallbackSample extends NNFOnFeedsCallback {
                  * 第四步：自定义图集类新闻展示页面
                  */
                 SamplePicSetGalleryActivity.start(context, newsInfo);
-            }
+            }// 目前只提供文章类和图集类新闻的点击调转，后续会扩展更多类型
         }
     }
 }
 ```
 ---
 
-#### 信息流主页回调NNFOnFeedsCallback
+#### 信息流主页回调接口说明
+
+NNFOnFeedsCallback为回调抽象类，提供信息流主页交互事件回调，目前支持的交互事件回调有：新闻被点击。
 
 - 新闻被点击
 
@@ -226,7 +285,7 @@ private class FeedsCallbackSample extends NNFOnFeedsCallback {
  *
  * @param context
  * @param newsInfo  当前新闻对应新闻列表中的数据源
- * @param extraData 额外参数
+ * @param extraData 用户自定义数据
  */
 public abstract void onNewsClick(Context context, NNFNewsInfo newsInfo, Object extraData);
 ```
@@ -236,8 +295,7 @@ public abstract void onNewsClick(Context context, NNFNewsInfo newsInfo, Object e
  若用户未实现该回调，则SDK会根据新闻的infoType自动跳转到对应的默认展示页面。
  
  若用户实现该回调，则跳转到用户回调。
-
-
+ 
 ---
 
 #### 创建文章类新闻展示页NNFArticleWebFragment实例
@@ -248,12 +306,26 @@ public abstract void onNewsClick(Context context, NNFNewsInfo newsInfo, Object e
  *
  * @param newsInfo          当前新闻对应新闻列表中的数据源
  * @param onArticleCallback 回调
- * @param extraData         额外参数
+ * @param extraData         用户自定义数据
  * @return
  */
 public static NNFArticleWebFragment createArticleFragment(NNFNewsInfo newsInfo, NNFOnArticleCallback onArticleCallback, Object extraData) 
 ```
-用户选择自己创建新闻详情页面时，可以通过该接口创建新闻详情视图实例，其中newsInfo为当前新闻对应新闻列表中的数据源，onArticleCallback为自定义回调，extraData为用户传入的额外参数。
+用户选择自己创建新闻详情页面时，可以通过该接口创建新闻详情视图实例，其中newsInfo为当前新闻对应新闻列表中的数据源，onArticleCallback为自定义回调，extraData 为用户自定义数据，该参数会在onArticleCallback回调中回传。
+
+==注意==：Activity配置
+
+由于文章类新闻展示页采用内嵌WebView实现，为了使WebView中的编辑框在编辑时能够弹出软键盘输入，请按照如下示例在AndroidManifest.xml中配置NNFArticleWebFragment依附的Activity的windowSoftInputMode属性：
+
+```java
+<activity
+    android:name=".SampleArticleActivity"
+    android:configChanges="orientation|screenSize|keyboardHidden"
+    android:screenOrientation="portrait"
+    // 设置后，该Activity总是调整屏幕的大小以便留出软键盘的空间
+    android:windowSoftInputMode="adjustResize">
+</activity>
+```
 
 ==注意==：提供两种模式
 
@@ -337,7 +409,9 @@ private void initArticleStepByStep() {
 ```
 ---
 
-#### 文章类新闻展示页回调NNFOnArticleCallback
+#### 文章类新闻展示页回调接口说明
+
+NNFOnArticleCallback为回调抽象类，提供文章类新闻展示页交互事件回调，目前支持的交互事件回调有：点击正文中的相关推荐、点击正文中的图片、文章类新闻详情加载成功、文章详情页面跳转到报错页面的回调、报错完成返回到文章详情页面的回调。
 
 - 点击正文中的相关推荐
 
@@ -347,7 +421,7 @@ private void initArticleStepByStep() {
  *
  * @param context
  * @param newsInfo
- * @param extraData 额外参数
+ * @param extraData 用户自定义数据
  */
 public abstract void onRelatedNewsClick(Context context, NNFNewsInfo newsInfo, Object extraData);
 ```
@@ -366,7 +440,7 @@ public abstract void onRelatedNewsClick(Context context, NNFNewsInfo newsInfo, O
  * @param index      当前图片是正文第几张图片
  * @param source     图片网络链接
  * @param imageInfos 正文图片数组
- * @param extraData  额外参数
+ * @param extraData  用户自定义数据
  */
 public abstract void onWebImageClick(Context context, String infoId, int index, String source, NNFImageInfo[] imageInfos, Object extraData);
 ```
@@ -374,14 +448,14 @@ public abstract void onWebImageClick(Context context, String infoId, int index, 
 
 ---
 
--文章类新闻详情加载成功
+- 文章类新闻详情加载成功
 
 ```java
 /**
  * 文章类新闻加载成功
  *
  * @param newsInfo  当前新闻对应新闻列表中的数据源
- * @param extraData 额外参数
+ * @param extraData 用户自定义数据
  */
 public abstract void onArticleLoaded(NNFNewsInfo newsInfo, Object extraData);
 ```
@@ -389,32 +463,33 @@ public abstract void onArticleLoaded(NNFNewsInfo newsInfo, Object extraData);
 
 ---
 
-- 详情页面跳转到报错页面的回调
+- 文章详情页面跳转到报错页面的回调
 
 ```java
 /**
  * 举报中
  *
  * @param issueDescription 举报描述
- * @param extraData        额外参数
+ * @param extraData        用户自定义数据
  */
 public void onIssueReporting(String issueDescription, Object extraData)
 ```
-在详情页点击报错跳转详情页面的回调，其中issueDescription为报错页面的相关描述，方便更改页面title之类的参数
+点击文章底部的举报按钮时，弹出举报选择框，触发该回调。其中issueDescription为报错页面的相关描述，方便更改页面title之类的参数
 
 ---
 
-- 详情页面跳转到报错完成返回到主页的回调
+- 报错完成返回到文章详情页面的回调
 
 ```java
 /**
  * 举报完成
  *
- * @param extraData 额外参数
+ * @param extraData 用户自定义数据
  */
 public void onIssueReportFinished(Object extraData) 
 ```
-在详情页点击报错跳转详情页面的回调，其中issueDescription为报错页面的相关描述，方便更改页面title之类的参数
+
+报错操作结束后触发该回调。
 
 ---
 
@@ -426,12 +501,13 @@ public void onIssueReportFinished(Object extraData)
  *
  * @param newsInfo                当前新闻对应新闻列表中的数据源
  * @param onPicSetGalleryCallback 回调
- * @param extraData               额外参数
+ * @param extraData               用户自定义数据
  * @return
  */
 public static NNFPicSetGalleryFragment createPicSetGalleryFragment(NNFNewsInfo newsInfo, NNFOnPicSetGalleryCallback onPicSetGalleryCallback, Object extraData)
 ```
-可以通过该接口返回图集页面的实例，其中newsInfo为当前新闻对应新闻列表中的数据源，onPicSetGalleryCallback为自定义回调。
+可以通过该接口返回图集页面的实例，其中newsInfo为当前新闻对应新闻列表中的数据源，onPicSetGalleryCallback为自定义回调，extraData 为用户自定义数据，该参数会在onPicSetGalleryCallback回调中回传。
+
 
 ==注意==：提供两种模式
 
@@ -490,7 +566,9 @@ public void initGalleryStepByStep(NNFNewsInfo newsInfo) {
 
 ---
 
-#### 图集类新闻回调NNFOnPicSetGalleryCallback
+#### 图集类新闻展示页回调接口说明
+
+NNFOnPicSetGalleryCallback为回调抽象类，提供图集类新闻展示页交互事件回调，目前支持的交互事件回调有：图集加载成功时的回调、左上角返回按钮的点击响应。
 
 - 图集加载成功时的回调
 
@@ -499,7 +577,7 @@ public void initGalleryStepByStep(NNFNewsInfo newsInfo) {
  * 图集类新闻加载成功
  *
  * @param newsInfo  当前新闻对应新闻列表中的数据源
- * @param extraData 额外参数
+ * @param extraData 用户自定义数据
  */
 public abstract void onPicSetLoaded(NNFNewsInfo newsInfo, Object extraData);
 ```
@@ -533,12 +611,12 @@ public abstract void onBackClick(Context context);
  * @param startIndex               当前图片是正文第几张图片
  * @param imageInfos               正文图片数组
  * @param onArticleGalleryCallback 回调
- * @param extraData                额外参数
+ * @param extraData                用户自定义数据
  * @return
  */
 public static NNFArticleGalleryFragment createArticleGalleryFragment(String infoId, int startIndex, NNFImageInfo[] imageInfos, NNFOnArticleGalleryCallback onArticleGalleryCallback, Object extraData)
 ```
-可以通过该接口返回新闻详情图片浏览页面的实例，其中infoId为当前新闻的ID，startIndex为当前的图片的索引，imageInfos为新闻详情的图片数组
+可以通过该接口返回新闻详情图片浏览页面的实例，其中infoId为当前新闻的ID，startIndex为当前的图片的索引，imageInfos为新闻详情的图片数组，onArticleGalleryCallback为自定义回调，extraData 为用户自定义数据，该参数会在onArticleGalleryCallback回调中回传。
 
 ---
 
@@ -588,7 +666,9 @@ private void initGalleryStepByStep(int startIndex, NNFImageInfo[] imageInfos, St
 }
 ```
 
-#### 文章类新闻正文图片集展示页回调NNFOnArticleGalleryCallback
+#### 文章类新闻正文图片集展示页回调接口说明
+
+NNFOnArticleGalleryCallback为回调抽象类，提供文章类新闻正文图片集展示页交互事件回调，目前支持的交互事件回调有：图片被点击。
 
 - 图片被点击
 
@@ -598,7 +678,7 @@ private void initGalleryStepByStep(int startIndex, NNFImageInfo[] imageInfos, St
  *
  * @param context   图片上下文
  * @param imageInfo 图片数据源
- * @param extraData 初始化NNFArticleGalleryFragment时传入的额外参数
+ * @param extraData 初始化NNFArticleGalleryFragment时传入的用户自定义数据
  */
 public abstract void onPicClick(Context context, NNFImageInfo imageInfo, Object extraData);
 ```
@@ -638,7 +718,3 @@ public void performRefresh()
 可调用该接口实现强制下拉刷新当前列表的功能
 
 ---
-
-
-
-
