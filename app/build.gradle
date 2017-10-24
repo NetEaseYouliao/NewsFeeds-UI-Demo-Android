@@ -62,22 +62,22 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
 
-    /*// data-sdk依赖库
+    // data-sdk依赖库
     compile 'com.alibaba:fastjson:1.2.8'
     compile 'com.getui:sdk:2.11.1.0'
     // ui-sdk依赖库
     compile "com.readystatesoftware.systembartint:systembartint:1.0.+"
-    compile 'com.github.bumptech.glide:glide:4.0.0-RC1'
-    compile 'org.greenrobot:eventbus:3.0.0'
+    compile "com.github.bumptech.glide:glide:$rootProject.glideVersion"
+    compile "org.greenrobot:eventbus:$rootProject.eventBusVersion"
     compile "com.android.support:recyclerview-v7:25.3.1"
 
     // aar文件依赖data-sdk & ui-sdk
     compile "com.netease.youliao:newsfeeds-data:$rootProject.newsfeedsDataVersion@aar"
-    compile "com.netease.youliao:newsfeeds-ui:$rootProject.newsfeedsUIVersion@aar"*/
+    compile "com.netease.youliao:newsfeeds-ui:$rootProject.newsfeedsUIVersion@aar"
 
     // 远程依赖数据sdk & ui sdk
-    compile "com.netease.youliao:newsfeeds-data:$rootProject.newsfeedsDataVersion"
-    compile "com.netease.youliao:newsfeeds-ui:$rootProject.newsfeedsUIVersion"
+//    compile "com.netease.youliao:newsfeeds-data:$rootProject.newsfeedsDataVersion"
+//    compile "com.netease.youliao:newsfeeds-ui:$rootProject.newsfeedsUIVersion"
     // 定位 sdk
     compile 'com.amap.api:location:latest.integration'
     // 网易云埔
