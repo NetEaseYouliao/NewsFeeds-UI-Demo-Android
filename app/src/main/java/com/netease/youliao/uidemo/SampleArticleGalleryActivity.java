@@ -7,7 +7,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
+import com.alibaba.fastjson.JSON;
 import com.netease.youliao.newsfeeds.model.NNFImageInfo;
+import com.netease.youliao.newsfeeds.remote.reflect.NNFJsonUtils;
 import com.netease.youliao.newsfeeds.ui.base.activity.BaseBlankActivity;
 import com.netease.youliao.newsfeeds.ui.core.NNFArticleGalleryFragment;
 import com.netease.youliao.newsfeeds.ui.core.NNewsFeedsUI;
@@ -53,7 +55,8 @@ public class SampleArticleGalleryActivity extends BaseBlankActivity {
         Intent intent = getIntent();
 
         int startIndex = intent.getIntExtra(KEY_POSITION_START, -1);
-        NNFImageInfo[] imageInfos = (NNFImageInfo[]) intent.getSerializableExtra(KEY_IMAGE_INFOS);
+        Object object = intent.getSerializableExtra(KEY_IMAGE_INFOS);
+        NNFImageInfo[] imageInfos = JSON.parseObject(JSON.toJSONString(object), NNFImageInfo[].class);
         String infoId = intent.getStringExtra(KEY_INFO_ID);
 
         /********* 集成方式请二选一 *********/
