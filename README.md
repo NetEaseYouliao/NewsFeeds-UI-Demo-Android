@@ -34,7 +34,7 @@ NewsFeeds UI SDK提供的功能如下：
 
 ### 1. Gradle集成
 
-我们推荐通过Gradle集成我们的sdk。
+我们推荐通过Gradle集成我们的sdk。由于ui-sdk是在data-sdk的基础上开发的，因此，使用ui-sdk必须同时依赖data-sdk，data-sdk的接入，请参考data-sdk接入文档。
 
 - jcenter远程依赖
 
@@ -48,19 +48,12 @@ allprojects {
 }
 ```
 
-第二步，在app module下的build.gradle中同时引入我们的data-sdk和ui-sdk的依赖，请自行将x.x替换为版本号，目前最新版为1.2
+第二步，在app module下的build.gradle中同时引入我们的data-sdk和ui-sdk的依赖，请自行将x.x替换为版本号，目前最新版分别为1.2和1.2.4
 
 
 ```java
 compile 'com.netease.youliao:newsfeeds-data:x.x'
 compile 'com.netease.youliao:newsfeeds-ui:x.x'
-```
-
-为了自动升级到最新的sdk，建议写成下面的形式：
-
-```java
-compile 'com.netease.youliao:newsfeeds-data:1.2+'
-compile 'com.netease.youliao:newsfeeds-ui:1.2+'
 ```
 
 - aar本地依赖
@@ -73,7 +66,7 @@ compile 'com.netease.youliao:newsfeeds-ui:1.2+'
 allprojects {
     repositories {
         jcenter()
-
+        
         // 添加aar所在目录
         flatDir {
             dirs 'libs'
@@ -82,7 +75,7 @@ allprojects {
 }
 ```
 
-第三步，在app module下的build.gradle中引入我们sdk的aar依赖，请自行将x.x替换为版本号，目前最新版为1.2
+第三步，在app module下的build.gradle中引入我们sdk的aar依赖，请自行将x.x替换为版本号，目前最新版分别为1.2和1.2.4
 
 我们的data-sdk和ui-sdk内部依赖了一些第三方库，
 
@@ -97,7 +90,7 @@ ui-sdk依赖了如下第三方库：
 
 ```java
 compile "com.readystatesoftware.systembartint:systembartint:1.0.+"
-compile 'com.github.bumptech.glide:glide:4.0.0-RC1'
+compile 'com.github.bumptech.glide:glide:3.7.0'
 compile 'org.greenrobot:eventbus:3.0.0'
 compile "com.android.support:recyclerview-v7:25.3.1"
 ```
@@ -114,7 +107,7 @@ dependencies {
     compile 'com.getui:sdk:2.11.1.0'
     // ui-sdk依赖库
     compile "com.readystatesoftware.systembartint:systembartint:1.0.+"
-    compile 'com.github.bumptech.glide:glide:4.0.0-RC1'
+    compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'org.greenrobot:eventbus:3.0.0'
     compile "com.android.support:recyclerview-v7:25.3.1"
     // aar文件依赖data-sdk & ui-sdk
@@ -134,24 +127,11 @@ new NNewsFeedsSDK.Builder()
     .setAppKey("4c92fbfc2e6e7046d6e3cafced******")
     .setAppSecret("b430f8362f9f65bc09a639f62b******")
     .setContext(getApplicationContext())
-    .setCacheEnabled(true)
-    .setMaxCacheTime(1 * 24 * 60 * 60 * 1000)
     .setLogLevel(NFLogUtil.LOG_DEBUG)
     .build();
 ```
 
 NNewsFeedsSDK为data-sdk的主入口，具体接口说明请参考data-sdk的使用文档。
-
-初始化接口及参数说明
-
-接口 | 参数 | 类型 | 描述
----|---|---|---
-setAppKey | appKey | String | 分配给应用的唯一标识，用户在CMS后台新建应用时生成
-setAppSecret | appSecret | String |  分配给应用的唯一秘钥，用户在CMS后台新建应用时生成
-setContext | context | Context | 传入app的Context，建议传入ApplicationContext
-setCacheEnabled | cacheEnabled | boolean | 是否开启新闻正文文本和图片缓存，默认开启
-setMaxCacheTime | maxCacheTime | long | 配置新闻正文文本和图片最大缓存时长, 单位毫秒，默认7天
-setLogLevel | logLevel | int | Android Studio等开发工具的 控制台Log等级，指定哪些日志需要输出
 
 ### 3. 混淆
 
@@ -173,6 +153,7 @@ setLogLevel | logLevel | int | Android Studio等开发工具的 控制台Log等�
 -keep class android.support.v4.app.NotificationCompat**{
     public *;
 }
+
 # 个推
 -dontwarn com.igexin.**
 -keep class com.igexin.** { *; }
@@ -181,6 +162,11 @@ setLogLevel | logLevel | int | Android Studio等开发工具的 控制台Log等�
 
 -keep class android.support.v4.app.NotificationCompat { *; }
 -keep class android.support.v4.app.NotificationCompat$Builder { *; }
+
+# fastjson
+-keep class javax.ws.rs.** { *; }
+-dontwarn com.alibaba.fastjson.**
+-keep class com.alibaba.fastjson.** { *; }
 ```
 
 ## ui-sdk接口说明
@@ -217,7 +203,21 @@ public static NNFeedsFragment createFeedsFragment(OnFeedsCallback onFeedsCallbac
 </activity>
 ```
 
-==注意==：提供两种模式
+==注意==：视频退出全屏
+
+由于NNFeedsFragment包含视频播放功能，视频播放支持全屏播放，若视频正在全屏播放，此时点击返回键，应先退出全屏播放。App开发人员需要重写NNFeedsFragment所在Activity的onBackPressed方法，并调用com.netease.youliao.newsfeeds.ui.libraries.jcvideoplayer_lib.JCVideoPlayer.onBackPressed();
+
+```java
+@Override
+public void onBackPressed() {
+    if (JCVideoPlayer.backPress()) {
+        return;
+    }
+    super.onBackPressed();
+}
+```
+
+==注意==：提供两种集成模式
 
 - 第一种，未自定义回调，则所有页面已经整合到一起，及文章详情页面、图集页面、新闻正文图片浏览页面都已封装
 
@@ -289,13 +289,13 @@ NNFOnFeedsCallback为回调抽象类，提供信息流主页交互事件回调�
  */
 public abstract void onNewsClick(Context context, NNFNewsInfo newsInfo, Object extraData);
 ```
-
+ 
  注意这里的extraData是初始化NNFeedsFragment实例时，传入的用户自定义数据。
-
+ 
  若用户未实现该回调，则SDK会根据新闻的infoType自动跳转到对应的默认展示页面。
-
+ 
  若用户实现该回调，则跳转到用户回调。
-
+ 
 ---
 
 #### 创建文章类新闻展示页NNFArticleWebFragment实例
@@ -309,7 +309,7 @@ public abstract void onNewsClick(Context context, NNFNewsInfo newsInfo, Object e
  * @param extraData         用户自定义数据
  * @return
  */
-public static NNFArticleWebFragment createArticleFragment(NNFNewsInfo newsInfo, NNFOnArticleCallback onArticleCallback, Object extraData)
+public static NNFArticleWebFragment createArticleFragment(NNFNewsInfo newsInfo, NNFOnArticleCallback onArticleCallback, Object extraData) 
 ```
 用户选择自己创建新闻详情页面时，可以通过该接口创建新闻详情视图实例，其中newsInfo为当前新闻对应新闻列表中的数据源，onArticleCallback为自定义回调，extraData 为用户自定义数据，该参数会在onArticleCallback回调中回传。
 
@@ -486,7 +486,7 @@ public void onIssueReporting(String issueDescription, Object extraData)
  *
  * @param extraData 用户自定义数据
  */
-public void onIssueReportFinished(Object extraData)
+public void onIssueReportFinished(Object extraData) 
 ```
 
 报错操作结束后触发该回调。
@@ -702,9 +702,9 @@ public void markNewsRead(String infoId, int adapterPosition)
 ```
 
  使用SDK整合的View，无需调用该接口；
-
+ 
  用户自定义跳转页面，需在新闻详情加载成功后，将新闻标记为已读，并主动调用该接口，刷新新闻列表的已读状态。其中infoId为当前新闻的ID，adapterPos为当前新闻在新闻列表适配器中的position。
-
+ 
 ---
 
 #### 强制刷新当前列表
