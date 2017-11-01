@@ -72,7 +72,7 @@ ext {
     glideVersion = "3.7.0"
     eventBusVersion = "3.0.0"
     newsfeedsDataVersion = "1.2+"
-    newsfeedsUIVersion = "1.2.2"
+    newsfeedsUIVersion = "1.2.4"
     sdkVersionName = "1.2"
     sdkVersionCode = 1
 }

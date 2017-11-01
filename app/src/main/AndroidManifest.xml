@@ -16,7 +16,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/YLAppTheme">
+        android:theme="@style/NNFAppTheme">
 
         <!--用户请将这里修改成你们的BUGRPT_APPID-->
         <meta-data

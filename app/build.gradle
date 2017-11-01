@@ -40,8 +40,8 @@ android {
                                     GETUI_APP_KEY        : "1oF1UF2IYo5Kx6rFGEPJG4",
                                     GETUI_APP_SECRET     : "kOKsNhxpga5suGKVrdkpv7"]
             buildConfigField("String", "PROJECT_KEY", "\"f61ee58affc49b7ffe9cadb85a3e30e2\"")
-            buildConfigField("String", "APP_KEY", "\"3c11d60d903e49d5a47ad2a58bb0db97\"")
-            buildConfigField("String", "APP_SECRET", "\"ca5137e40b874abd893e762f1d53d839\"")
+            buildConfigField("String", "APP_KEY", "\"e8bb5b1141684d6591755f9961bdcabe\"")
+            buildConfigField("String", "APP_SECRET", "\"8c8afd7ba86f4ece8bf1b6e895fb56cb\"")
             buildConfigField("int", "SERVER_TYPE", "0")
         }
 

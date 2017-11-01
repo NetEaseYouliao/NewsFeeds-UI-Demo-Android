@@ -17,11 +17,11 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_gravity="left|center_vertical"
-            android:drawableLeft="@drawable/selector_navi_back"
+            android:drawableLeft="@drawable/nnf_selector_navi_back"
             android:gravity="center_vertical"
             android:minWidth="50dp"
             android:paddingLeft="@dimen/navigation_left_padding"
-            android:textColor="@color/selector_btn_text_color_white"
+            android:textColor="@color/nnf_selector_btn_text_color_white"
             android:textSize="@dimen/text_size_m"/>
 
         <TextView
@@ -33,14 +33,14 @@
             android:layout_centerInParent="true"
             android:maxLines="1"
             android:maxWidth="220dp"
-            android:textColor="@color/text_title_lv1_color"
+            android:textColor="@color/nnf_text_title_lv1_color"
             android:textSize="@dimen/text_size_19"/>
         <View
             android:id="@+id/bottom_divider"
             android:layout_width="match_parent"
             android:layout_height="@dimen/divider_thick_1px"
             android:layout_alignParentBottom="true"
-            android:background="@color/news_list_line_under_indicator"
+            android:background="@color/nnf_news_list_line_under_indicator"
             />
     </RelativeLayout>
 

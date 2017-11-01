@@ -27,7 +27,7 @@ public class SamplePicSetGalleryActivity extends BaseBlankActivity {
         super.onCreate(savedInstanceState);
 
         setRealContentView(R.layout.activity_main);
-        setStatueBarColor(R.color.black);
+        setStatueBarColor(R.color.nnf_black);
 
         parseIntent();
     }
