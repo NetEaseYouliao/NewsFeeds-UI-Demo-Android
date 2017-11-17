@@ -71,8 +71,6 @@ ext {
     htqrcode = "1.1.0-SNAPSHOT"
     glideVersion = "3.7.0"
     eventBusVersion = "3.0.0"
-    newsfeedsDataVersion = "1.2.4"
-    newsfeedsUIVersion = "1.2.4"
-    sdkVersionName = "1.2"
-    sdkVersionCode = 1
+    newsfeedsDataVersion = "1.3"
+    newsfeedsUIVersion = "1.3.1"
 }

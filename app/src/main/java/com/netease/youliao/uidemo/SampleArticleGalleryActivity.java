@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
-import com.alibaba.fastjson.JSON;
 import com.netease.youliao.newsfeeds.model.NNFImageInfo;
 import com.netease.youliao.newsfeeds.remote.reflect.NNFJsonUtils;
 import com.netease.youliao.newsfeeds.ui.base.activity.BaseBlankActivity;
@@ -56,7 +55,7 @@ public class SampleArticleGalleryActivity extends BaseBlankActivity {
 
         int startIndex = intent.getIntExtra(KEY_POSITION_START, -1);
         Object object = intent.getSerializableExtra(KEY_IMAGE_INFOS);
-        NNFImageInfo[] imageInfos = JSON.parseObject(JSON.toJSONString(object), NNFImageInfo[].class);
+        NNFImageInfo[] imageInfos = NNFJsonUtils.fromJson(NNFJsonUtils.toJson(object), NNFImageInfo[].class);
         String infoId = intent.getStringExtra(KEY_INFO_ID);
 
         /********* 集成方式请二选一 *********/
@@ -87,14 +86,12 @@ public class SampleArticleGalleryActivity extends BaseBlankActivity {
         FragmentTransaction ft = fm.beginTransaction();
 
         /**
-         * 第二步：NNFArticleGalleryFragment 设置点击事件回调；
+         * 第二步：可选，NNFArticleGalleryFragment 设置点击事件回调；如不设置，使用SDK内部的默认回调
          */
         NNFOnArticleGalleryCallback onArticleGalleryCallback = new NNFOnArticleGalleryCallback() {
             @Override
             public void onPicClick(Context context, NNFImageInfo imageInfo, Object extraData) {
-                /**
-                 * 第三步：设置图片点击行为
-                 */
+                // 点击图片返回
                 SampleArticleGalleryActivity.this.finish();
             }
         };

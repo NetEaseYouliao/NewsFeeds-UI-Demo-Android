@@ -48,7 +48,7 @@ allprojects {
 }
 ```
 
-第二步，在app module下的build.gradle中同时引入我们的data-sdk和ui-sdk的依赖，请自行将x.x替换为版本号，目前最新版分别为1.2和1.2.4
+第二步，在app module下的build.gradle中同时引入我们的data-sdk和ui-sdk的依赖，请自行将x.x替换为版本号，目前最新版均为1.3
 
 
 ```java
@@ -75,7 +75,7 @@ allprojects {
 }
 ```
 
-第三步，在app module下的build.gradle中引入我们sdk的aar依赖，请自行将x.x替换为版本号，目前最新版分别为1.2和1.2.4
+第三步，在app module下的build.gradle中引入我们sdk的aar依赖，请自行将x.x替换为版本号，目前最新版均为1.3
 
 我们的data-sdk和ui-sdk内部依赖了一些第三方库，
 
@@ -83,7 +83,6 @@ allprojects {
 
 ```java
 compile 'com.alibaba:fastjson:1.2.8'
-compile 'com.getui:sdk:2.11.1.0'
 ```
 
 ui-sdk依赖了如下第三方库：
@@ -104,7 +103,6 @@ dependencies {
     ...
     // data-sdk依赖库
     compile 'com.alibaba:fastjson:1.2.8'
-    compile 'com.getui:sdk:2.11.1.0'
     // ui-sdk依赖库
     compile "com.readystatesoftware.systembartint:systembartint:1.0.+"
     compile 'com.github.bumptech.glide:glide:3.7.0'
@@ -127,7 +125,7 @@ new NNewsFeedsSDK.Builder()
     .setAppKey("4c92fbfc2e6e7046d6e3cafced******")
     .setAppSecret("b430f8362f9f65bc09a639f62b******")
     .setContext(getApplicationContext())
-    .setLogLevel(NFLogUtil.LOG_DEBUG)
+    .setLogLevel(NNFLogUtil.LOG_DEBUG)
     .build();
 ```
 

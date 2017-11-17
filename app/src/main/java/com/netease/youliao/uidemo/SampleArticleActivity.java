@@ -79,7 +79,7 @@ public class SampleArticleActivity extends BaseBlankActivity {
         FragmentTransaction ft = fm.beginTransaction();
         NNFArticleWebFragment articleWebFragment = NNewsFeedsUI.createArticleFragment(mNewsInfo, new NNFOnArticleCallback() {
             /**
-             * 第二步：为文章类展示页 NNFArticleWebFragment 设置点击事件回调；
+             * 第二步：可选，为文章类展示页 NNFArticleWebFragment 设置点击事件回调；如不设置，使用SDK内部的默认回调
              */
 
             @Override
@@ -103,7 +103,9 @@ public class SampleArticleActivity extends BaseBlankActivity {
                 /**
                  * 第五步：通知新闻已阅，信息流主页UI刷新
                  */
-                SampleFeedsActivity.sInstance.getFeedsFragment().markNewsRead(newsInfo.infoId);
+                if (null != SampleFeedsActivity.sInstance) {
+                    SampleFeedsActivity.sInstance.getFeedsFragment().markNewsRead(newsInfo.infoId);
+                }
             }
 
             @Override

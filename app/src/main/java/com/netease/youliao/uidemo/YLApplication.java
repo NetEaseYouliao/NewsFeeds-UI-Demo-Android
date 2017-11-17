@@ -25,8 +25,6 @@ public class YLApplication extends Application {
                 .setContext(getApplicationContext())
                 .setLogLevel(NNFLogUtil.LOG_VERBOSE)
                 .setServerType(BuildConfig.SERVER_TYPE)
-                .setCacheEnabled(true)
-                .setMaxCacheTime(3 * 24 * 60 * 60 * 1000)
                 .build();
 
         /**

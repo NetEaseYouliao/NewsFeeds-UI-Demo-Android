@@ -8,7 +8,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/action_bar_height">
+        android:layout_height="@dimen/nnf_action_bar_height">
 
         <TextView
             android:id="@+id/tv_left"
@@ -20,9 +20,9 @@
             android:drawableLeft="@drawable/nnf_selector_navi_back"
             android:gravity="center_vertical"
             android:minWidth="50dp"
-            android:paddingLeft="@dimen/navigation_left_padding"
+            android:paddingLeft="@dimen/nnf_navigation_left_padding"
             android:textColor="@color/nnf_selector_btn_text_color_white"
-            android:textSize="@dimen/text_size_m"/>
+            android:textSize="@dimen/nnf_text_size_m"/>
 
         <TextView
             android:id="@+id/tv_title"
@@ -34,11 +34,11 @@
             android:maxLines="1"
             android:maxWidth="220dp"
             android:textColor="@color/nnf_text_title_lv1_color"
-            android:textSize="@dimen/text_size_19"/>
+            android:textSize="@dimen/nnf_text_size_19"/>
         <View
             android:id="@+id/bottom_divider"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/divider_thick_1px"
+            android:layout_height="@dimen/nnf_divider_thick_1px"
             android:layout_alignParentBottom="true"
             android:background="@color/nnf_news_list_line_under_indicator"
             />

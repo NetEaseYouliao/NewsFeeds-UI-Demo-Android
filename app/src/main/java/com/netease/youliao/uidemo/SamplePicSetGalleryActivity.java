@@ -12,6 +12,7 @@ import com.netease.youliao.newsfeeds.ui.base.activity.BaseBlankActivity;
 import com.netease.youliao.newsfeeds.ui.core.NNewsFeedsUI;
 import com.netease.youliao.newsfeeds.ui.core.callbacks.NNFOnPicSetGalleryCallback;
 import com.netease.youliao.newsfeeds.ui.core.NNFPicSetGalleryFragment;
+import com.netease.youliao.newsfeeds.ui.core.gallery.page.DefaultPicSetGalleryActivity;
 
 /**
  * Created by zhangdan on 2017/10/12.
@@ -74,7 +75,7 @@ public class SamplePicSetGalleryActivity extends BaseBlankActivity {
         FragmentTransaction ft = fm.beginTransaction();
 
         /**
-         * 第二步：为图集展示页 NNFPicSetGalleryFragment 设置点击事件回调；
+         * 第二步：可选，为图集展示页 NNFPicSetGalleryFragment 设置点击事件回调；如不设置，使用SDK内部的默认回调
          */
         NNFOnPicSetGalleryCallback onPicSetGalleryCallback = new NNFOnPicSetGalleryCallback() {
             @Override
@@ -82,15 +83,25 @@ public class SamplePicSetGalleryActivity extends BaseBlankActivity {
                 /**
                  * 第三步：通知新闻已阅，信息流主页UI刷新
                  */
-                SampleFeedsActivity.sInstance.getFeedsFragment().markNewsRead(newsInfo.infoId);
+                if (null != SampleFeedsActivity.sInstance) {
+                    SampleFeedsActivity.sInstance.getFeedsFragment().markNewsRead(newsInfo.infoId);
+                }
             }
 
             @Override
             public void onBackClick(Context context) {
-                /**
-                 * 第四步：设置图集展示页左上角返回按钮点击后的行为
-                 */
                 SamplePicSetGalleryActivity.this.finish();
+            }
+
+            @Override
+            public void onPicSetClick(Context context, NNFNewsInfo newsInfo) {
+                super.onPicSetClick(context, newsInfo);
+                SamplePicSetGalleryActivity.start(context, newsInfo);
+                // 避免OOM，展示相关图集时，销毁上一图集
+                if (context instanceof SamplePicSetGalleryActivity) {
+                    SamplePicSetGalleryActivity activity = (SamplePicSetGalleryActivity) context;
+                    activity.finish();
+                }
             }
         };
 
