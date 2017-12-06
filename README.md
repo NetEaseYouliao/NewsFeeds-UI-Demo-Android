@@ -10,6 +10,14 @@
 
 NewsFeeds UI SDK提供的功能如下：
 
+- 信息流首页视图
+- 文章详情页视图
+- 图集浏览页面
+- 视频浏览页面
+- 文章图片浏览页面
+
+接入的模式有两种：
+
 - 快速集成信息流
 
 > 信息流的基本功能包含信息流主页、文章类新闻展示页、图集类新闻展示页等，若用户选择快速集成方式，则使用UI SDK提供的所有默认页面。
@@ -36,46 +44,7 @@ NewsFeeds UI SDK提供的功能如下：
 
 我们推荐通过Gradle集成我们的sdk。由于ui-sdk是在data-sdk的基础上开发的，因此，使用ui-sdk必须同时依赖data-sdk，data-sdk的接入，请参考data-sdk接入文档。
 
-- jcenter远程依赖
-
-第一步，在project module下的build.gradle配置repositories。创建项目时，会自动包含jcenter。若无，请添加。
-
-```java
-allprojects {
-    repositories {
-        jcenter()
-    }
-}
-```
-
-第二步，在app module下的build.gradle中同时引入我们的data-sdk和ui-sdk的依赖，请自行将x.x替换为版本号，目前最新版均为1.3
-
-
-```java
-compile 'com.netease.youliao:newsfeeds-data:x.x'
-compile 'com.netease.youliao:newsfeeds-ui:x.x'
-```
-
-- aar本地依赖
-
-第一步，导入aar包。在工程app结构下新建libs目录，同时将我们提供的`newsfeeds-sdk-x.x.aar`和`newsfeeds-ui-x.x.aar`文件复制到当前libs目录下
-
-第二步，在project module下的build.gradle配置repositories
-
-```java
-allprojects {
-    repositories {
-        jcenter()
-        
-        // 添加aar所在目录
-        flatDir {
-            dirs 'libs'
-        }
-    }
-}
-```
-
-第三步，在app module下的build.gradle中引入我们sdk的aar依赖，请自行将x.x替换为版本号，目前最新版均为1.3
+- 第三方依赖说明
 
 我们的data-sdk和ui-sdk内部依赖了一些第三方库，
 
@@ -94,24 +63,26 @@ compile 'org.greenrobot:eventbus:3.0.0'
 compile "com.android.support:recyclerview-v7:25.3.1"
 ```
 
-因此，采用aar本地引入的方式，需要同时引入data-sdk依赖库 & ui-sdk依赖库 & data-sdk & ui-sdk。
+若您的App也依赖了这些第三方库，请确保您依赖的第三方库的版本与我们sdk依赖的第三方库版本兼容。
+
+- jcenter远程依赖
+
+第一步，在project module下的build.gradle配置repositories。创建项目时，会自动包含jcenter。若无，请添加。
 
 ```java
-dependencies {
-    // 新建工程时自动生成
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    ...
-    // data-sdk依赖库
-    compile 'com.alibaba:fastjson:1.2.8'
-    // ui-sdk依赖库
-    compile "com.readystatesoftware.systembartint:systembartint:1.0.+"
-    compile 'com.github.bumptech.glide:glide:3.7.0'
-    compile 'org.greenrobot:eventbus:3.0.0'
-    compile "com.android.support:recyclerview-v7:25.3.1"
-    // aar文件依赖data-sdk & ui-sdk
-    compile 'com.netease.youliao:newsfeeds-data:x.x@aar'
-    compile 'com.netease.youliao:newsfeeds-ui:x.x@aar'
+allprojects {
+    repositories {
+        jcenter()
+    }
 }
+```
+
+第二步，在app module下的build.gradle中同时引入我们的data-sdk和ui-sdk的依赖，请自行将x.x替换为版本号，目前最新版均为1.3.5
+
+
+```java
+compile 'com.netease.youliao:newsfeeds-data:x.x'
+compile 'com.netease.youliao:newsfeeds-ui:x.x'
 ```
 
 ### 2. 初始化
@@ -171,7 +142,154 @@ NNewsFeedsSDK为data-sdk的主入口，具体接口说明请参考data-sdk的使
 
 ### ui-sdk主入口
 
-NNewsFeedsUI 为ui-sdk主入口，提供多个Fragment的实例化调用。
+NNewsFeedsUI 为ui-sdk主入口，提供全局设置及多个Fragment的实例化调用。
+
+#### 设置全局分享点击回调
+
+为实现分享引流拉新，我们的ui-sdk预留了分享按钮，当开发人员设置了分享回调，新闻详情页面、图集详情页面、视频页面都会显示分享按钮，若未设置，则隐藏。
+
+- 定义
+
+```java
+public static void setShareCallback(NNFOnShareCallback shareCallback)
+```
+
+其中 NNFOnShareCallback 为 interface ，定义如下：
+
+```java
+public interface NNFOnShareCallback {
+    /**
+     * 分享
+     *
+     * @param shareInfo 分享必要字段集合
+     * @param index     0：微信好友 1：朋友圈
+     */
+    void onWebShareClick(Map<String, String> shareInfo, int index);
+}
+```
+
+其中，shareInfo以键值对的形式存储了单条新闻的必要描述信息，开发人员可根据这些信息构造分享视图，详细说明如下：
+
+key | value描述
+---|---|---
+title | 新闻标题
+infoId | 新闻ID
+infoType | 新闻类型，article/picset/video
+producer  | 新闻提供者，user表示用户自编辑新闻，recommendation表示来自个性化推荐系统
+summary | 新闻简介
+source | 新闻来源
+iconUrl | 新闻内部某张图片
+
+开发人员需要实现 onWebShareClick 方法，给出分享操作的具体实现。
+
+- 示例
+
+```java
+// 设置全局分享回调
+NNewsFeedsUI.setShareCallback(new NNFOnShareCallback() {
+    @Override
+    public void onWebShareClick(Map<String, String> shareInfo, int index) {
+        ShareUtil.shareImp(getApplicationContext(), api, shareInfo, index);
+    }
+});
+```
+
+微信分享示例：
+
+```java
+public class ShareUtil {
+    private static final int THUMB_SIZE = 150;
+
+    public static void shareImp(Context context, final IWXAPI api, Map<String, String> shareInfo, final int type) {
+        WXWebpageObject webpage = new WXWebpageObject();
+        webpage.webpageUrl = buildShareReq(shareInfo);
+        Log.d("SHARE", "webpageUrl->" + webpage.webpageUrl);
+        final WXMediaMessage msg = new WXMediaMessage(webpage);
+        msg.title = shareInfo.get(NNFUIConstants.FIELD_TITLE);
+        String summary = shareInfo.get(NNFUIConstants.FIELD_SUMMARY);
+        msg.description = TextUtils.isEmpty(summary) ? shareInfo.get(NNFUIConstants.FIELD_SOURCE) : summary;
+        String iconUrl = shareInfo.get(NNFUIConstants.FIELD_ICONURL);
+
+        if (!TextUtils.isEmpty(iconUrl)) {
+            Glide.with(context).load(iconUrl).asBitmap().into(new SimpleTarget<Bitmap>() {
+                @Override
+                public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                    sendShareReq(api, resource, type, msg);
+                }
+            });
+        } else {
+            // 使用默认图标
+            Bitmap bmp = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ic_launcher);
+            sendShareReq(api, bmp, type, msg);
+        }
+    }
+
+    private static void sendShareReq(IWXAPI api, Bitmap bmp, int type, WXMediaMessage msg) {
+        int targetScene = SendMessageToWX.Req.WXSceneSession;
+        switch (type) {
+            case 0:
+                targetScene = SendMessageToWX.Req.WXSceneSession;
+                break;
+            case 1:
+                targetScene = SendMessageToWX.Req.WXSceneTimeline;
+                break;
+        }
+        Bitmap thumbBmp = Bitmap.createScaledBitmap(bmp, THUMB_SIZE, THUMB_SIZE, true);
+        msg.setThumbImage(thumbBmp);
+
+        SendMessageToWX.Req req = new SendMessageToWX.Req();
+        req.transaction = buildTransaction("webpage");
+        req.message = msg;
+        req.scene = targetScene;
+        api.sendReq(req);
+    }
+
+	// h5分享链接构造
+    private static String buildShareReq(Map<String, String> shareInfo) {
+        String infoId = shareInfo.get(NNFUIConstants.FIELD_INFOID);
+        String infoType = shareInfo.get(NNFUIConstants.FIELD_INFOTYPE);
+        String title = shareInfo.get(NNFUIConstants.FIELD_TITLE);
+        String producer = shareInfo.get(NNFUIConstants.FIELD_PRODUCER);
+        String source = shareInfo.get(NNFUIConstants.FIELD_SOURCE);
+        producer = TextUtils.isEmpty(producer) ? "recommendation" : producer;
+        String urlFormat = BuildConfig.SHARE_SERVER + "h5/index.html#/info?fss=1&platform=1&appkey=%s&secretkey=%s&infoid=%s&infotype=%s&producer=%s&awakeIcon=%s&awakeTitle=%s" +
+                "&androidOpenUrl=%s&androidDownUrl=%s&" +
+                "&iOSOpenUrl=%s&iOSDownUrl=%s" +
+                "&source=%s";
+        String awakeIcon = "http%3A%2F%2Fcrash-public-online.nos.netease.com%2F1510554783102637.png";
+        String openUrl = "youliao%3A%2F%2Fyouliao.163yun.com%3FinfoId%3D" + infoId + "%26infoType%3D" + infoType + "%26producer%3D" + producer;
+        String androidDownUrl = "http%3A%2F%2Fyxs.im%2FGskiq1";
+        String iOSDownUrl = "https%3A%2F%2Fitunes.apple.com%2Fapp%2Fid893031254";
+        return String.format(urlFormat,
+                BuildConfig.APP_KEY,
+                BuildConfig.APP_SECRET,
+                infoId,
+                infoType,
+                producer,
+                awakeIcon,
+                title,
+                openUrl,
+                androidDownUrl,
+                openUrl,
+                iOSDownUrl,
+                source);
+    }
+
+    private static String buildTransaction(final String type) {
+        return (type == null) ? String.valueOf(System.currentTimeMillis()) : type + System.currentTimeMillis();
+    }
+}
+```
+
+==注意==：
+
+- 快速集成模式：实现该全局回调，则新闻详情页面、图集详情页面、视频页面都会显示分享按钮；未实现该全局回调，则不会显示分享按钮
+
+- 自定义集成模式：该分享回调和各个页面级分享回调只要实现一个则会显示分享按钮，若两个回调都实现，则点击分享的时候，触发页面级分享回调。
+
+h5分享链接的构造规则请参考网易有料h5文档，也可参考UI SDK演示Demo。
+
+---
 
 #### 创建信息流主页NNFeedsFragment实例
 
@@ -201,9 +319,9 @@ public static NNFeedsFragment createFeedsFragment(OnFeedsCallback onFeedsCallbac
 </activity>
 ```
 
-==注意==：视频退出全屏
+==注意==：视频退出全屏&资源释放
 
-由于NNFeedsFragment包含视频播放功能，视频播放支持全屏播放，若视频正在全屏播放，此时点击返回键，应先退出全屏播放。App开发人员需要重写NNFeedsFragment所在Activity的onBackPressed方法，并调用com.netease.youliao.newsfeeds.ui.libraries.jcvideoplayer_lib.JCVideoPlayer.onBackPressed();
+由于NNFeedsFragment包含视频播放功能，视频播放支持全屏播放，若视频正在全屏播放，此时点击返回键，应先退出全屏播放。App开发人员需要重写NNFeedsFragment所依附Activity的onBackPressed方法，并调用com.netease.youliao.newsfeeds.ui.libraries.jcvideoplayer_lib.JCVideoPlayer.onBackPressed();
 
 ```java
 @Override
@@ -212,6 +330,16 @@ public void onBackPressed() {
         return;
     }
     super.onBackPressed();
+}
+```
+
+当NNFeedsFragment所依附Activity处于onPause生命周期时，应释放视频资源，停止视频播放。
+
+```java
+@Override
+public void onPause() {
+    super.onPause();
+    JCVideoPlayer.releaseAllVideos();
 }
 ```
 
@@ -308,8 +436,23 @@ public abstract void onNewsClick(Context context, NNFNewsInfo newsInfo, Object e
  * @return
  */
 public static NNFArticleWebFragment createArticleFragment(NNFNewsInfo newsInfo, NNFOnArticleCallback onArticleCallback, Object extraData) 
+
+/**
+ * 文章类新闻展示的默认实现
+ *
+ * @param newsInfo          当前新闻对应新闻列表中的数据源
+ * @param onArticleCallback 回调
+ * @param onShareCallback   分享回调
+ * @param extraData         自定义参数
+ * @return
+ */
+public static NNFArticleWebFragment createArticleFragment(NNFNewsInfo newsInfo, NNFOnArticleCallback onArticleCallback, NNFOnShareCallback onShareCallback, Object extraData)
 ```
+
 用户选择自己创建新闻详情页面时，可以通过该接口创建新闻详情视图实例，其中newsInfo为当前新闻对应新闻列表中的数据源，onArticleCallback为自定义回调，extraData 为用户自定义数据，该参数会在onArticleCallback回调中回传。
+
+NNFOnShareCallback为页面级分享回调，该页面级分享回调和全局分享回调只要实现一个则会显示分享按钮，若两个回调都实现，则点击分享的时候，触发页面级分享回调。
+
 
 ==注意==：Activity配置
 
@@ -342,6 +485,17 @@ private void initArticleByOneStep() {
 }
 ```
 
+开发人员在创建`NNFArticleWebFragment`实例时可设置页面级分享回调，示例代码如下：
+
+```java
+NNFArticleWebFragment articleWebFragment = NNewsFeedsUI.createArticleFragment(mNewsInfo, null, new NNFOnShareCallback() {
+    @Override
+    public void onWebShareClick(Map<String, String> shareInfo, int index) {
+        ShareUtil.shareImp(SampleArticleActivity.this, api, shareInfo, index);
+    }
+}, null);
+```
+
 - 自定义集成，用户指定界面交互回调逻辑。
 
 ```java
@@ -372,13 +526,16 @@ private void initArticleStepByStep() {
             SampleArticleGalleryActivity.start(context, infoId, index, imageInfos);
         }
 
-        @Override
-        public void onArticleLoaded(NNFNewsInfo newsInfo, Object extraData) {
-            /**
-             * 第五步：通知新闻已阅，信息流主页UI刷新
-             */
-            SampleFeedsActivity.sInstance.getFeedsFragment().markNewsRead(newsInfo.infoId);
-        }
+		@Override
+		public void onArticleLoaded(NNFNewsDetails details, Object extraData) {
+		    /**
+		     * 第五步：通知新闻已阅，信息流主页UI刷新
+		     */
+		    if (null != SampleFeedsActivity.sInstance) {
+		        SampleFeedsActivity.sInstance.getFeedsFragment().markNewsRead(details.infoId);
+		    }
+		    mTextView.setText(mNewsInfo.source);
+		}
 
         @Override
         public void onIssueReporting(String issueDescription, Object extraData) {
@@ -503,9 +660,21 @@ public void onIssueReportFinished(Object extraData)
  * @return
  */
 public static NNFPicSetGalleryFragment createPicSetGalleryFragment(NNFNewsInfo newsInfo, NNFOnPicSetGalleryCallback onPicSetGalleryCallback, Object extraData)
+
+/**
+ * 展示图集类新闻
+ *
+ * @param newsInfo                当前新闻对应新闻列表中的数据源
+ * @param onPicSetGalleryCallback 回调
+ * @param onShareCallback         分享回调
+ * @param extraData               自定义参数
+ * @return
+ */
+public static NNFPicSetGalleryFragment createPicSetGalleryFragment(NNFNewsInfo newsInfo, NNFOnPicSetGalleryCallback onPicSetGalleryCallback, NNFOnShareCallback onShareCallback, Object extraData)
 ```
 可以通过该接口返回图集页面的实例，其中newsInfo为当前新闻对应新闻列表中的数据源，onPicSetGalleryCallback为自定义回调，extraData 为用户自定义数据，该参数会在onPicSetGalleryCallback回调中回传。
 
+NNFOnShareCallback为页面级分享回调，该页面级分享回调和全局分享回调只要实现一个则会显示分享按钮，若两个回调都实现，则点击分享的时候，触发页面级分享回调。
 
 ==注意==：提供两种模式
 
@@ -524,6 +693,17 @@ public void initGalleryByOneStep(NNFNewsInfo newsInfo) {
 }
 ```
 
+开发人员在创建`NNFPicSetGalleryFragment`实例时可设置页面级分享回调，示例代码如下：
+
+```java
+mArticleWebFragment = NNewsFeedsUI.createArticleFragment(mNewsInfo, null, new NNFOnShareCallback() {
+    @Override
+    public void onWebShareClick(Map<String, String> shareInfo, int index) {
+        ShareUtil.shareImp(SampleArticleActivity.this, api, shareInfo, index);
+    }
+}, null);
+```
+
 - 自定义集成
 
 ```java
@@ -539,11 +719,13 @@ public void initGalleryStepByStep(NNFNewsInfo newsInfo) {
      */
     NNFOnPicSetGalleryCallback onPicSetGalleryCallback = new NNFOnPicSetGalleryCallback() {
         @Override
-        public void onPicSetLoaded(NNFNewsInfo newsInfo, Object extraData) {
+        public void onPicSetLoaded(NNFNewsDetails details, Object extraData) {
             /**
              * 第三步：通知新闻已阅，信息流主页UI刷新
              */
-            SampleFeedsActivity.sInstance.getFeedsFragment().markNewsRead(newsInfo.infoId);
+            if (null != SampleFeedsActivity.sInstance) {
+                SampleFeedsActivity.sInstance.getFeedsFragment().markNewsRead(details.infoId);
+            }
         }
 
         @Override
@@ -687,6 +869,18 @@ public abstract void onPicClick(Context context, NNFImageInfo imageInfo, Object 
 
 ### NNFeedsFragment类接口说明
 
+#### 返回新闻列表顶部
+
+```java
+/**
+ * 点击导航栏返回到顶部，模仿ios点击状态栏返回到顶部的功能
+ */
+public void scrollToTop()
+```
+调用该接口可返回当前列表顶部。可用于模仿ios点击状态栏返回到顶部的功能。
+
+---
+
 #### 刷新已读新闻的状态
 
 ```java
@@ -698,8 +892,6 @@ public abstract void onPicClick(Context context, NNFImageInfo imageInfo, Object 
  */
 public void markNewsRead(String infoId, int adapterPosition)
 ```
-
- 使用SDK整合的View，无需调用该接口；
  
  用户自定义跳转页面，需在新闻详情加载成功后，将新闻标记为已读，并主动调用该接口，刷新新闻列表的已读状态。其中infoId为当前新闻的ID，adapterPos为当前新闻在新闻列表适配器中的position。
  
@@ -713,6 +905,20 @@ public void markNewsRead(String infoId, int adapterPosition)
  */
 public void performRefresh()
 ```
-可调用该接口实现强制下拉刷新当前列表的功能
+可调用该接口实现强制下拉刷新当前列表的功能。
+
+---
+
+#### 定位到指定频道
+
+```java
+/**
+ * 允许用户直接定位到某一个频道
+ *
+ * @param channelId
+ */
+public void setSelectedChannel(String channelId)
+```
+可调用该接口定位到指定频道。
 
 ---

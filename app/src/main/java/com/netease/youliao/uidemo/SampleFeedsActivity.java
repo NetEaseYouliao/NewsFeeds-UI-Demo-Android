@@ -1,11 +1,14 @@
 package com.netease.youliao.uidemo;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
@@ -19,7 +22,13 @@ import com.netease.youliao.newsfeeds.ui.base.activity.BaseNavigationBarActivity;
 import com.netease.youliao.newsfeeds.ui.core.NNewsFeedsUI;
 import com.netease.youliao.newsfeeds.ui.core.callbacks.NNFOnFeedsCallback;
 import com.netease.youliao.newsfeeds.ui.core.NNFeedsFragment;
-import com.netease.youliao.newsfeeds.ui.utils.YLConstants;
+import com.netease.youliao.newsfeeds.ui.core.callbacks.NNFOnShareCallback;
+import com.netease.youliao.newsfeeds.ui.core.details.DefaultMoreVideosActivity;
+import com.netease.youliao.newsfeeds.ui.utils.NNFUIConstants;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
+import com.tencent.mm.opensdk.openapi.WXAPIFactory;
+
+import java.util.Map;
 
 public class SampleFeedsActivity extends BaseNavigationBarActivity {
 
@@ -30,10 +39,15 @@ public class SampleFeedsActivity extends BaseNavigationBarActivity {
     private NNFeedsFragment mFeedsFragment;
     public static SampleFeedsActivity sInstance;
 
+    private IWXAPI api;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRealContentView(R.layout.activity_main);
+
+        api = WXAPIFactory.createWXAPI(this, BuildConfig.SHARE_WX_APP_ID, true);
+        api.registerApp(BuildConfig.SHARE_WX_APP_ID);
 
         setTitle("网易有料");
         // 不显示左侧返回按钮
@@ -62,12 +76,67 @@ public class SampleFeedsActivity extends BaseNavigationBarActivity {
         /********* 集成方式请二选一 *********/
 
         initLocation();
+
+        parseIntent(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        parseIntent(intent);
+    }
+
+    /**
+     * 分享回流处理
+     *
+     * @param intent
+     */
+    private void parseIntent(Intent intent) {
+        if (null == intent) return;
+
+        Uri uri = intent.getData();
+
+        if (null != uri) {
+            String infoId = uri.getQueryParameter("infoId");
+
+            if (!TextUtils.isEmpty(infoId)) {
+                NNFNewsInfo newsInfo = new NNFNewsInfo();
+                newsInfo.infoId = infoId;
+                newsInfo.source = uri.getQueryParameter("source");
+                String infoType = uri.getQueryParameter("infoType");
+                newsInfo.infoType = TextUtils.isEmpty(infoType) ? NNFUIConstants.INFO_TYPE_ARTICLE : infoType;
+                String producer = uri.getQueryParameter("producer");
+                newsInfo.producer = TextUtils.isEmpty(producer) ? "recommendation" : producer;
+
+                switch (newsInfo.infoType) {
+                    case NNFUIConstants.INFO_TYPE_ARTICLE:
+                        SampleArticleActivity.start(this, newsInfo);
+                        break;
+                    case NNFUIConstants.INFO_TYPE_PICSET:
+                        SamplePicSetGalleryActivity.start(this, newsInfo);
+                        break;
+                    case NNFUIConstants.INFO_TYPE_VIDEO:
+                        DefaultMoreVideosActivity.start(this, newsInfo.infoId, newsInfo.infoType, newsInfo.producer);
+                        break;
+                }
+
+            }
+        }
     }
 
     /**
      * 第一步：接入信息流UI SDK，快速集成信息流主页 NNFeedsFragment
      */
     private void initFeedsByOneStep() {
+        // 设置全局分享回调
+        NNewsFeedsUI.setShareCallback(new NNFOnShareCallback() {
+            @Override
+            public void onWebShareClick(Map<String, String> shareInfo, int index) {
+                // context不能传入activity，这是因为会发生发生页面跳转后，activity onStop，图片加载也会随之stop
+                ShareUtil.shareImp(getApplicationContext(), api, shareInfo, index);
+            }
+        });
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         mFeedsFragment = NNewsFeedsUI.createFeedsFragment(null, null);
@@ -79,6 +148,14 @@ public class SampleFeedsActivity extends BaseNavigationBarActivity {
      * 第一步：接入信息流UI SDK，自定义集成信息流主页 NNFeedsFragment
      */
     private void initFeedsStepByStep() {
+        // 设置全局分享回调
+//        NNewsFeedsUI.setShareCallback(new NNFOnShareCallback() {
+//            @Override
+//            public void onWebShareClick(Map<String, String> shareInfo, int index) {
+//                // context不能传入activity，这是因为会发生发生页面跳转后，activity onStop，图片加载也会随之stop
+//                ShareUtil.shareImp(getApplicationContext(), api, shareInfo, index);
+//            }
+//        });
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         mFeedsFragment = NNewsFeedsUI.createFeedsFragment(new FeedsCallbackSample(), null);
@@ -93,16 +170,18 @@ public class SampleFeedsActivity extends BaseNavigationBarActivity {
         @Override
         public void onNewsClick(Context context, NNFNewsInfo newsInfo, Object extraData) {
             if (null != newsInfo && null != newsInfo.infoType) {
-                if (YLConstants.INFO_TYPE_ARTICLE.equals(newsInfo.infoType)) {
+                if (NNFUIConstants.INFO_TYPE_ARTICLE.equals(newsInfo.infoType)) {
                     /**
                      * 第三步：自定义文章类新闻展示页面
                      */
                     SampleArticleActivity.start(context, newsInfo);
-                } else if (YLConstants.INFO_TYPE_PICSET.equals(newsInfo.infoType)) {
+                } else if (NNFUIConstants.INFO_TYPE_PICSET.equals(newsInfo.infoType)) {
                     /**
                      * 第四步：自定义图集类新闻展示页面
                      */
                     SamplePicSetGalleryActivity.start(context, newsInfo);
+                } else if (NNFUIConstants.INFO_TYPE_VIDEO.equals(newsInfo.infoType)) {
+                    DefaultMoreVideosActivity.start(context, newsInfo);
                 }
             }
         }

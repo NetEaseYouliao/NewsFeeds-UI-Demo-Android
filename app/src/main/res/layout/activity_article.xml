@@ -28,13 +28,27 @@
             android:id="@+id/tv_title"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_centerInParent="true"
             android:ellipsize="end"
             android:gravity="center"
-            android:layout_centerInParent="true"
             android:maxLines="1"
             android:maxWidth="220dp"
             android:textColor="@color/nnf_text_title_lv1_color"
             android:textSize="@dimen/nnf_text_size_19"/>
+
+        <ImageView
+            android:id="@+id/iv_share"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="50dp"
+            android:minHeight="@dimen/nnf_action_bar_height"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:scaleType="centerInside"
+            android:src="@drawable/nnf_selector_btn_share"
+            android:visibility="visible"
+            />
+
         <View
             android:id="@+id/bottom_divider"
             android:layout_width="match_parent"

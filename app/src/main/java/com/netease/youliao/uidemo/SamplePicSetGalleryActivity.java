@@ -7,12 +7,17 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 
+import com.netease.youliao.newsfeeds.model.NNFNewsDetails;
 import com.netease.youliao.newsfeeds.model.NNFNewsInfo;
 import com.netease.youliao.newsfeeds.ui.base.activity.BaseBlankActivity;
 import com.netease.youliao.newsfeeds.ui.core.NNewsFeedsUI;
 import com.netease.youliao.newsfeeds.ui.core.callbacks.NNFOnPicSetGalleryCallback;
 import com.netease.youliao.newsfeeds.ui.core.NNFPicSetGalleryFragment;
-import com.netease.youliao.newsfeeds.ui.core.gallery.page.DefaultPicSetGalleryActivity;
+import com.netease.youliao.newsfeeds.ui.core.callbacks.NNFOnShareCallback;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
+import com.tencent.mm.opensdk.openapi.WXAPIFactory;
+
+import java.util.Map;
 
 /**
  * Created by zhangdan on 2017/10/12.
@@ -22,10 +27,13 @@ import com.netease.youliao.newsfeeds.ui.core.gallery.page.DefaultPicSetGalleryAc
 
 public class SamplePicSetGalleryActivity extends BaseBlankActivity {
     private final static String KEY_NEWS_INFO = "newsInfo";
+    private IWXAPI api;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        api = WXAPIFactory.createWXAPI(this, BuildConfig.SHARE_WX_APP_ID);
 
         setRealContentView(R.layout.activity_main);
         setStatueBarColor(R.color.nnf_black);
@@ -79,12 +87,12 @@ public class SamplePicSetGalleryActivity extends BaseBlankActivity {
          */
         NNFOnPicSetGalleryCallback onPicSetGalleryCallback = new NNFOnPicSetGalleryCallback() {
             @Override
-            public void onPicSetLoaded(NNFNewsInfo newsInfo, Object extraData) {
+            public void onPicSetLoaded(NNFNewsDetails details, Object extraData) {
                 /**
                  * 第三步：通知新闻已阅，信息流主页UI刷新
                  */
                 if (null != SampleFeedsActivity.sInstance) {
-                    SampleFeedsActivity.sInstance.getFeedsFragment().markNewsRead(newsInfo.infoId);
+                    SampleFeedsActivity.sInstance.getFeedsFragment().markNewsRead(details.infoId);
                 }
             }
 
@@ -105,7 +113,12 @@ public class SamplePicSetGalleryActivity extends BaseBlankActivity {
             }
         };
 
-        NNFPicSetGalleryFragment picSetGalleryFragment = NNewsFeedsUI.createPicSetGalleryFragment(newsInfo, onPicSetGalleryCallback, null);
+        NNFPicSetGalleryFragment picSetGalleryFragment = NNewsFeedsUI.createPicSetGalleryFragment(newsInfo, onPicSetGalleryCallback, new NNFOnShareCallback() {
+            @Override
+            public void onWebShareClick(Map<String, String> shareInfo, int index) {
+                ShareUtil.shareImp(SamplePicSetGalleryActivity.this, api, shareInfo, index);
+            }
+        }, null);
 
         ft.replace(R.id.fragment_container, picSetGalleryFragment);
         ft.commit();
