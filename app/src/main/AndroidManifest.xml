@@ -21,7 +21,7 @@
         <!--用户请将这里修改成你们的BUGRPT_APPID-->
         <meta-data
             android:name="BUGRPT_APPID"
-            android:value="A002710217"/>
+            android:value="${BUGRPT_APPID}"/>
 
         <!--高德定位-->
         <meta-data

@@ -50,6 +50,7 @@ android {
             applicationId "net.sourceforge.simcpux"
 //            applicationId "com.netease.youliao.uidemo"
             manifestPlaceholders = [YOULIAO_CHANNEL_VALUE: "Online",
+                                    BUGRPT_APPID         : "A005581971",
                                     AMAP_API_KEY         : "8842217a33df2b413391d4eebec7d240",
                                     GETUI_APP_ID         : "I0G0KdseXB7NqZaZbZYfpA",
                                     GETUI_APP_KEY        : "1oF1UF2IYo5Kx6rFGEPJG4",
@@ -63,6 +64,7 @@ android {
         Share {
             applicationId "net.sourceforge.simcpux"
             manifestPlaceholders = [YOULIAO_CHANNEL_VALUE: "Share",
+                                    BUGRPT_APPID         : "A005581971",
                                     AMAP_API_KEY         : "8842217a33df2b413391d4eebec7d240",
                                     GETUI_APP_ID         : "SaeL6U4LFo5mPmXWoDxJF2",
                                     GETUI_APP_KEY        : "O36pXVdkqG60XcnMsJI0I8",
