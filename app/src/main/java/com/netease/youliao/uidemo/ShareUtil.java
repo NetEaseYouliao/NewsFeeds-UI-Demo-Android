@@ -72,31 +72,29 @@ public class ShareUtil {
     private static String buildShareReq(Map<String, String> shareInfo) {
         String infoId = shareInfo.get(NNFUIConstants.FIELD_INFOID);
         String infoType = shareInfo.get(NNFUIConstants.FIELD_INFOTYPE);
-        String title = shareInfo.get(NNFUIConstants.FIELD_TITLE);
         String producer = shareInfo.get(NNFUIConstants.FIELD_PRODUCER);
         String source = shareInfo.get(NNFUIConstants.FIELD_SOURCE);
+        String recId = shareInfo.get(NNFUIConstants.FIELD_RECID);
+        String algInfo = shareInfo.get(NNFUIConstants.FIELD_ALGINFO);
         producer = TextUtils.isEmpty(producer) ? "recommendation" : producer;
-        String urlFormat = BuildConfig.SHARE_SERVER + "h5/index.html#/info?fss=1&platform=1&appkey=%s&secretkey=%s&infoid=%s&infotype=%s&producer=%s&awakeIcon=%s&awakeTitle=%s" +
-                "&androidOpenUrl=%s&androidDownUrl=%s&" +
-                "&iOSOpenUrl=%s&iOSDownUrl=%s" +
-                "&source=%s";
-        String awakeIcon = "http%3A%2F%2Fcrash-public-online.nos.netease.com%2F1510554783102637.png";
+        String urlFormat = BuildConfig.SHARE_SERVER + "m/#/info?fss=1&ak=%s&sk=%s&id=%s&it=%s&p=%s" +
+                "&aou=%s" +
+                "&iou=%s" +
+                "&st=%s" +
+                "&rid=%s" +
+                "&info=%s";
         String openUrl = "youliao%3A%2F%2Fyouliao.163yun.com%3FinfoId%3D" + infoId + "%26infoType%3D" + infoType + "%26producer%3D" + producer;
-        String androidDownUrl = "http%3A%2F%2Fyxs.im%2FGskiq1";
-        String iOSDownUrl = "https%3A%2F%2Fitunes.apple.com%2Fapp%2Fid893031254";
         return String.format(urlFormat,
                 BuildConfig.APP_KEY,
                 BuildConfig.APP_SECRET,
                 infoId,
                 infoType,
                 producer,
-                awakeIcon,
-                title,
                 openUrl,
-                androidDownUrl,
                 openUrl,
-                iOSDownUrl,
-                source);
+                source,
+                recId,
+                algInfo);
     }
 
     private static String buildTransaction(final String type) {

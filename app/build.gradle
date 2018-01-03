@@ -7,8 +7,8 @@ android {
         applicationId "com.netease.youliao.uidemo"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode 1
-        versionName "1.3.5"
+        versionCode 5
+        versionName "1.4.5"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         ndk {
@@ -52,27 +52,9 @@ android {
             manifestPlaceholders = [YOULIAO_CHANNEL_VALUE: "Online",
                                     BUGRPT_APPID         : "A005581971",
                                     AMAP_API_KEY         : "8842217a33df2b413391d4eebec7d240",
-                                    GETUI_APP_ID         : "I0G0KdseXB7NqZaZbZYfpA",
-                                    GETUI_APP_KEY        : "1oF1UF2IYo5Kx6rFGEPJG4",
-                                    GETUI_APP_SECRET     : "kOKsNhxpga5suGKVrdkpv7"]
-            buildConfigField("String", "PROJECT_KEY", "\"f61ee58affc49b7ffe9cadb85a3e30e2\"")
+            ]
             buildConfigField("String", "APP_KEY", "\"3c11d60d903e49d5a47ad2a58bb0db97\"")
             buildConfigField("String", "APP_SECRET", "\"ca5137e40b874abd893e762f1d53d839\"")
-            buildConfigField("int", "SERVER_TYPE", "0")
-        }
-
-        Share {
-            applicationId "net.sourceforge.simcpux"
-            manifestPlaceholders = [YOULIAO_CHANNEL_VALUE: "Share",
-                                    BUGRPT_APPID         : "A005581971",
-                                    AMAP_API_KEY         : "8842217a33df2b413391d4eebec7d240",
-                                    GETUI_APP_ID         : "SaeL6U4LFo5mPmXWoDxJF2",
-                                    GETUI_APP_KEY        : "O36pXVdkqG60XcnMsJI0I8",
-                                    GETUI_APP_SECRET     : "seLKjwEah68kgR46gjeNj3"]
-            buildConfigField("String", "PROJECT_KEY", "\"58cf335e241bfed37b0f6856f3d448f5\"")
-            buildConfigField("String", "APP_KEY", "\"3c11d60d903e49d5a47ad2a58bb0db97\"")
-            buildConfigField("String", "APP_SECRET", "\"ca5137e40b874abd893e762f1d53d839\"")
-            buildConfigField("int", "SERVER_TYPE", "2")
         }
 
     }

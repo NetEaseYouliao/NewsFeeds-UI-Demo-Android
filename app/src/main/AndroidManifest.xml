@@ -18,12 +18,12 @@
         android:supportsRtl="true"
         android:theme="@style/NNFAppTheme">
 
-        <!--用户请将这里修改成你们的BUGRPT_APPID-->
+        <!--用户请将这里修改成你们的网易云捕BUGRPT_APPID-->
         <meta-data
             android:name="BUGRPT_APPID"
             android:value="${BUGRPT_APPID}"/>
 
-        <!--高德定位-->
+        <!--用户请将这里修改成你们的高德定位AMAP_API_KEY-->
         <meta-data
             android:name="com.amap.api.v2.apikey"
             android:value="${AMAP_API_KEY}"/>

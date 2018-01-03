@@ -1,5 +1,6 @@
 package com.netease.youliao.uidemo;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -22,7 +23,6 @@ import com.netease.youliao.newsfeeds.ui.core.NNewsFeedsUI;
 import com.netease.youliao.newsfeeds.ui.core.callbacks.NNFOnArticleCallback;
 import com.netease.youliao.newsfeeds.ui.core.NNFArticleWebFragment;
 import com.netease.youliao.newsfeeds.ui.core.callbacks.NNFOnShareCallback;
-import com.netease.youliao.newsfeeds.ui.utils.NNFShareUtil;
 import com.netease.youliao.newsfeeds.ui.utils.PopWindowSamples;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
@@ -130,11 +130,8 @@ public class SampleArticleActivity extends BaseBlankActivity {
             @Override
             public void onArticleLoaded(NNFNewsDetails details, Object extraData) {
                 /**
-                 * 第五步：通知新闻已阅，信息流主页UI刷新
+                 * 第五步：显示分享图标等
                  */
-                if (null != SampleFeedsActivity.sInstance) {
-                    SampleFeedsActivity.sInstance.getFeedsFragment().markNewsRead(details.infoId);
-                }
 
                 mNewsInfo.source = details.source;
                 mTextView.setText(mNewsInfo.source);
@@ -182,11 +179,13 @@ public class SampleArticleActivity extends BaseBlankActivity {
         Intent intent = new Intent();
         intent.setClass(from, SampleArticleActivity.class);
         intent.putExtra(KEY_NEWS_INFO, newsInfo);
+        if (!(from instanceof Activity)) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
         from.startActivity(intent);
     }
 
     private void initSharePopView(final NNFNewsDetails details) {
-        final Map<String, String> shareInfo = NNFShareUtil.buildShareInfo(details);
         final String[] dataSource = new String[]{
                 ResourcesUtil.getString(this, com.netease.youliao.newsfeeds.ui.R.string.nnf_share_wx_session),
                 ResourcesUtil.getString(this, com.netease.youliao.newsfeeds.ui.R.string.nnf_share_wx_timeline)};

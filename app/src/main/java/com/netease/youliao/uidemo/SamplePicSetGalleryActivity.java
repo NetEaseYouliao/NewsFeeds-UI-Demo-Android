@@ -1,5 +1,6 @@
 package com.netease.youliao.uidemo;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -45,6 +46,9 @@ public class SamplePicSetGalleryActivity extends BaseBlankActivity {
         Intent intent = new Intent();
         intent.setClass(from, SamplePicSetGalleryActivity.class);
         intent.putExtra(KEY_NEWS_INFO, newsInfo);
+        if (!(from instanceof Activity)) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
         from.startActivity(intent);
     }
 
@@ -87,23 +91,19 @@ public class SamplePicSetGalleryActivity extends BaseBlankActivity {
          */
         NNFOnPicSetGalleryCallback onPicSetGalleryCallback = new NNFOnPicSetGalleryCallback() {
             @Override
-            public void onPicSetLoaded(NNFNewsDetails details, Object extraData) {
-                /**
-                 * 第三步：通知新闻已阅，信息流主页UI刷新
-                 */
-                if (null != SampleFeedsActivity.sInstance) {
-                    SampleFeedsActivity.sInstance.getFeedsFragment().markNewsRead(details.infoId);
-                }
-            }
-
-            @Override
             public void onBackClick(Context context) {
+                /**
+                 * 第三步：设置图集展示页左上角返回按钮点击后的行为
+                 */
                 SamplePicSetGalleryActivity.this.finish();
             }
 
             @Override
             public void onPicSetClick(Context context, NNFNewsInfo newsInfo) {
                 super.onPicSetClick(context, newsInfo);
+                /**
+                 * 第四步：设置相关图集被点击后的行为
+                 */
                 SamplePicSetGalleryActivity.start(context, newsInfo);
                 // 避免OOM，展示相关图集时，销毁上一图集
                 if (context instanceof SamplePicSetGalleryActivity) {

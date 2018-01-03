@@ -11,7 +11,7 @@ import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
-
+import com.alibaba.fastjson.JSON;
 import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
@@ -19,16 +19,28 @@ import com.amap.api.location.AMapLocationListener;
 import com.netease.youliao.newsfeeds.core.NNewsFeedsSDK;
 import com.netease.youliao.newsfeeds.model.NNFNewsInfo;
 import com.netease.youliao.newsfeeds.ui.base.activity.BaseNavigationBarActivity;
+import com.netease.youliao.newsfeeds.ui.base.fragment.NNFChannelContentFragment;
 import com.netease.youliao.newsfeeds.ui.core.NNewsFeedsUI;
 import com.netease.youliao.newsfeeds.ui.core.callbacks.NNFOnFeedsCallback;
 import com.netease.youliao.newsfeeds.ui.core.NNFeedsFragment;
 import com.netease.youliao.newsfeeds.ui.core.callbacks.NNFOnShareCallback;
 import com.netease.youliao.newsfeeds.ui.core.details.DefaultMoreVideosActivity;
+import com.netease.youliao.newsfeeds.ui.core.entrance.NNFEntranceFragmentType;
+import com.netease.youliao.newsfeeds.ui.custom.CustomOption;
+import com.netease.youliao.newsfeeds.ui.custom.NNFCustomConfigure;
+import com.netease.youliao.newsfeeds.ui.custom.func.NNFFeedsFuncOption;
+import com.netease.youliao.newsfeeds.ui.custom.ui.NNFFeedsUIOption;
+import com.netease.youliao.newsfeeds.ui.utils.IOUtil;
 import com.netease.youliao.newsfeeds.ui.utils.NNFUIConstants;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Map;
+import static com.netease.youliao.newsfeeds.ui.custom.func.NNFArticleFuncOption.NFSharePlatformWXTimeline;
+import static com.netease.youliao.newsfeeds.ui.custom.func.NNFFeedsFuncOption.NFFeedsOptionThumModNone;
 
 public class SampleFeedsActivity extends BaseNavigationBarActivity {
 
@@ -68,16 +80,29 @@ public class SampleFeedsActivity extends BaseNavigationBarActivity {
         /********* 集成方式请二选一 *********/
 
         // 快速集成
-//        initFeedsByOneStep();
+        initFeedsByOneStep();
 
         // 自定义集成
-        initFeedsStepByStep();
+//        initFeedsStepByStep();
 
         /********* 集成方式请二选一 *********/
+
+
+        // initGlobalConfigure();
+
+//        generateStr();
+//        initGlobalConfigureByJson();
+//        initSmallEntrance();
+
 
         initLocation();
 
         parseIntent(getIntent());
+    }
+
+    private void generateStr() {
+        String str = null;
+        str = JSON.toJSONString(NNFCustomConfigure.getInstance());
     }
 
     @Override
@@ -129,6 +154,8 @@ public class SampleFeedsActivity extends BaseNavigationBarActivity {
      * 第一步：接入信息流UI SDK，快速集成信息流主页 NNFeedsFragment
      */
     private void initFeedsByOneStep() {
+        Map<String, Map<String, Object>> map = new HashMap<>();
+        // initNNFeedsConfigure(map);
         // 设置全局分享回调
         NNewsFeedsUI.setShareCallback(new NNFOnShareCallback() {
             @Override
@@ -137,12 +164,129 @@ public class SampleFeedsActivity extends BaseNavigationBarActivity {
                 ShareUtil.shareImp(getApplicationContext(), api, shareInfo, index);
             }
         });
+
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        mFeedsFragment = NNewsFeedsUI.createFeedsFragment(null, null);
+        mFeedsFragment = NNewsFeedsUI.createFeedsFragment(null, null, map);
         ft.replace(R.id.fragment_container, mFeedsFragment);
         ft.commitAllowingStateLoss();
     }
+
+    public void initSmallEntrance() {
+        //信息流小入口样式配置Map
+        Map<String, Object> smallUIMap = new HashMap<>();
+        smallUIMap.put("titleColor", "#FFC0CB");
+        smallUIMap.put("selectBackgroundColor", "#333333");
+        smallUIMap.put("singleIconImage", R.mipmap.ic_launcher);
+
+
+        //信息流小入口功能配置Map
+        Map<String, Object> smallFuncMap = new HashMap<>();
+        smallFuncMap.put("autoScrollInterval", 1000);
+
+//        Map<String, Map<String,Object>> map = new HashMap<>();
+//        map.put(NNFCustomConfigure.NNFSmallEntranceUIOptionKey, smallUIMap);
+//        map.put(NNFCustomConfigure.NNFSmallEntranceFuncOptionKey, smallFuncMap);
+
+        String jsonStr = "{ \"smallEntranceFuncOption\": {\n" +
+                "    \"autoScrollInterval\": 3000,\n" +
+                "    \"countInPage\": 2,\n" +
+                "    \"refreshCount\": 6\n" +
+                "  },\n" +
+                "  \"smallEntranceUIOption\": {\n" +
+                "    \"backgroundColor\": \"#FFFFFFFF\",\n" +
+                "    \"borderColor\": \"#00000000\",\n" +
+                "    \"lineSpace\": 20,\n" +
+                "    \"selectBackgroundColor\": \"#f1f4f7\",\n" +
+                "    \"titleColor\": \"#333333\",\n" +
+                "    \"titleFontSize\": 17\n" +
+                "  } }";
+        Map<String, Map<String, Object>> map = JSON.parseObject(jsonStr, Map.class);
+
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+        //创建Map时导入
+        NNFChannelContentFragment fragment = NNewsFeedsUI.createChannelContentViewFragment(null, map, NNFEntranceFragmentType.NNFChannelFragmentSmallEntrance, null, "1170");
+        ft.replace(R.id.fragment_container, fragment);
+        ft.commitAllowingStateLoss();
+    }
+
+    public void initGlobalConfigure() {
+        //信息流列表UI样式配置，属性和对应的值通过Key，Value形式传入
+        Map<String, Object> feedsUIOptionMap = new HashMap<>();
+        feedsUIOptionMap.put("cellBackgroundColor", "#FFFFFF");
+        feedsUIOptionMap.put("channelBackgroundColor", "#FFFFFF");
+        feedsUIOptionMap.put("backgroundColor", "#00BFFF");
+
+        //信息流列表功能配置，属性和对应的值通过Key，Value形式传入
+        Map<String, Object> feedsFuncMap = new HashMap<>();
+        feedsFuncMap.put("slidable", false);
+        feedsFuncMap.put("thumbMode", NFFeedsOptionThumModNone);
+
+        //文章详情列表配置，属性和对应的值通过Key，Value形式传入
+        Map<String, Object> articleUIMap = new HashMap<>();
+        articleUIMap.put("backgroundColor", "#00BFFF");
+        articleUIMap.put("titleColor", "#ab2b2b");
+        articleUIMap.put("articleTextColor", "#0099FB");
+
+        //文章详情功能配置，属性和对应的值通过Key，Value形式传入
+        Map<String, Object> articleFuncMap = new HashMap<>();
+        articleFuncMap.put("showRelated", true);
+        articleFuncMap.put("platforms", new int[]{NFSharePlatformWXTimeline});
+
+        //传入各个独立的配置项
+        Map<String, Object> customConfigureMap = new HashMap<>();
+        customConfigureMap.put(NNFCustomConfigure.NNFFeedsUIOptionKey, feedsUIOptionMap);
+        customConfigureMap.put(NNFCustomConfigure.NNFFeedsFuncOptionKey, feedsFuncMap);
+        customConfigureMap.put(NNFCustomConfigure.NNFArticleUIOptionKey, articleUIMap);
+        customConfigureMap.put(NNFCustomConfigure.NNFArticleFuncOptionKey, articleFuncMap);
+
+        //调用setCustomConfigure，传入全局的配置
+        NNewsFeedsUI.setCustomConfigure(customConfigureMap);
+    }
+
+    public void initGlobalConfigureByJson() {
+        String json = null;
+        try {
+            InputStream inputStream = getAssets().open("json/customconfigure.json");
+            json = IOUtil.readInputStream(inputStream);
+        } catch (IOException e) {
+
+        }
+        Map<String, Object> customConfigureMap = JSON.parseObject(json, Map.class);
+        NNewsFeedsUI.setCustomConfigure(customConfigureMap);
+    }
+
+    public void initNNFeedsConfigure() {
+        Map<String, Map<String, Object>> map = new HashMap<>();
+
+        //配置信息流页面UI样式
+        Map<String, Object> feedsUIMap = new HashMap<>();
+        feedsUIMap.put("cellBackgroundColor", "#ab2b2b");
+        feedsUIMap.put("channelBackgroundColor", "#0099FB");
+        feedsUIMap.put("backgroundColor", "#FFFFFF");
+        feedsUIMap.put("channelBackgroundColor", "#ab2b2b");
+        feedsUIMap.put("pullingText", "这就是下滑");
+        feedsUIMap.put("refreshSuccessBackgroundColor", "#FFFFFF");
+
+        //配置信息流页面功能
+        Map<String, Object> feedsFuncMap = new HashMap<>();
+        feedsFuncMap.put("slidable", false);
+        feedsFuncMap.put("thumbMode", NFFeedsOptionThumModNone);
+
+        //添加UI，功能配置项
+        map.put(NNFCustomConfigure.NNFFeedsUIOptionKey, feedsUIMap);
+        map.put(NNFCustomConfigure.NNFFeedsFuncOptionKey, feedsFuncMap);
+
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction ft = fm.beginTransaction();
+
+        //集成创建单个信息流页面时传入
+        mFeedsFragment = NNewsFeedsUI.createFeedsFragment(null, null, map);
+        ft.replace(R.id.fragment_container, mFeedsFragment);
+        ft.commitAllowingStateLoss();
+    }
+
 
     /**
      * 第一步：接入信息流UI SDK，自定义集成信息流主页 NNFeedsFragment
@@ -156,11 +300,32 @@ public class SampleFeedsActivity extends BaseNavigationBarActivity {
 //                ShareUtil.shareImp(getApplicationContext(), api, shareInfo, index);
 //            }
 //        });
+        HashMap<String, CustomOption> map = new HashMap<>();
+
+        initCustomStyle(map);
+
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        mFeedsFragment = NNewsFeedsUI.createFeedsFragment(new FeedsCallbackSample(), null);
+        mFeedsFragment = NNewsFeedsUI.createFeedsFragment(new FeedsCallbackSample(), null, null);
         ft.replace(R.id.fragment_container, mFeedsFragment);
         ft.commitAllowingStateLoss();
+    }
+
+
+    private void initCustomStyle(HashMap<String, CustomOption> map) {
+        //频道相关设置
+
+        NNFFeedsUIOption nnfFeedsUIOption = new NNFFeedsUIOption();
+
+        nnfFeedsUIOption.showSeperator = false;
+
+        NNFFeedsFuncOption feedsFuncOption = new NNFFeedsFuncOption();
+        feedsFuncOption.refreshCount = 30;
+        feedsFuncOption.thumbMode = NFFeedsOptionThumModNone;
+
+
+        map.put(NNFCustomConfigure.NNFFeedsFuncOptionKey, feedsFuncOption);
+        map.put(NNFCustomConfigure.NNFFeedsUIOptionKey, nnfFeedsUIOption);
     }
 
     /**
@@ -181,6 +346,9 @@ public class SampleFeedsActivity extends BaseNavigationBarActivity {
                      */
                     SamplePicSetGalleryActivity.start(context, newsInfo);
                 } else if (NNFUIConstants.INFO_TYPE_VIDEO.equals(newsInfo.infoType)) {
+                    /**
+                     * 第五步：自定义视频类新闻展示页面
+                     */
                     DefaultMoreVideosActivity.start(context, newsInfo);
                 }
             }

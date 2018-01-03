@@ -1,5 +1,6 @@
 package com.netease.youliao.uidemo;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -47,6 +48,9 @@ public class SampleArticleGalleryActivity extends BaseBlankActivity {
         intent.putExtra(KEY_POSITION_START, start);
         intent.putExtra(KEY_INFO_ID, infoId);
         intent.putExtra(KEY_IMAGE_INFOS, imageInfos);
+        if (!(from instanceof Activity)) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
         from.startActivity(intent);
     }
 
