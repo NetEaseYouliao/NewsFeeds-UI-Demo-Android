@@ -28,6 +28,7 @@ import com.netease.youliao.newsfeeds.ui.core.details.DefaultMoreVideosActivity;
 import com.netease.youliao.newsfeeds.ui.core.entrance.NNFEntranceFragmentType;
 import com.netease.youliao.newsfeeds.ui.custom.CustomOption;
 import com.netease.youliao.newsfeeds.ui.custom.NNFCustomConfigure;
+import com.netease.youliao.newsfeeds.ui.custom.func.NNFArticleFuncOption;
 import com.netease.youliao.newsfeeds.ui.custom.func.NNFFeedsFuncOption;
 import com.netease.youliao.newsfeeds.ui.custom.ui.NNFFeedsUIOption;
 import com.netease.youliao.newsfeeds.ui.utils.IOUtil;
@@ -80,6 +81,7 @@ public class SampleFeedsActivity extends BaseNavigationBarActivity {
         /********* 集成方式请二选一 *********/
 
         // 快速集成
+        hideShare();
         initFeedsByOneStep();
 
         // 自定义集成
@@ -353,6 +355,13 @@ public class SampleFeedsActivity extends BaseNavigationBarActivity {
                 }
             }
         }
+    }
+
+    private void hideShare() {
+        NNFArticleFuncOption articleFuncOption = new NNFArticleFuncOption();
+        articleFuncOption.platforms = null;
+
+        NNFCustomConfigure.getInstance().articleFuncOption = articleFuncOption;
     }
 
     public NNFeedsFragment getFeedsFragment() {
