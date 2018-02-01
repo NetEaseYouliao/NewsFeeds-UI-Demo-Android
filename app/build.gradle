@@ -7,8 +7,8 @@ android {
         applicationId "com.netease.youliao.uidemo"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode 5
-        versionName "1.4.5"
+        versionCode rootProject.versionCode
+        versionName "$rootProject.versionName"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         ndk {
@@ -74,9 +74,16 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
 
-    // 远程依赖数据sdk & ui sdk
+    // data-sdk依赖库
+    compile 'com.alibaba:fastjson:1.2.8'
+    // ui-sdk依赖库
+    compile "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
+    compile "com.readystatesoftware.systembartint:systembartint:$rootProject.systembartintVersion"
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+
     compile "com.netease.youliao:newsfeeds-data:$rootProject.newsfeedsDataVersion"
     compile "com.netease.youliao:newsfeeds-ui:$rootProject.newsfeedsUIVersion"
+
     // 定位 sdk
     compile 'com.amap.api:location:latest.integration'
     // 网易云埔
