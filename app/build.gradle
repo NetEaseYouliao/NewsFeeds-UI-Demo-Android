@@ -81,8 +81,8 @@ dependencies {
     compile "com.readystatesoftware.systembartint:systembartint:$rootProject.systembartintVersion"
     compile 'com.github.bumptech.glide:glide:3.7.0'
 
-    compile "com.netease.youliao:newsfeeds-data:$rootProject.newsfeedsDataVersion"
-    compile "com.netease.youliao:newsfeeds-ui:$rootProject.newsfeedsUIVersion"
+    compile "com.netease.youliao:newsfeeds-data:$rootProject.newsfeedsDataVersion@aar"
+    compile "com.netease.youliao:newsfeeds-ui:$rootProject.newsfeedsUIVersion@aar"
 
     // 定位 sdk
     compile 'com.amap.api:location:latest.integration'

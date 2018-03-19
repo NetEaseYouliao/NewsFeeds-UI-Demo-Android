@@ -51,7 +51,7 @@ public class SampleArticleActivity extends BaseBlankActivity {
 
         setRealContentView(R.layout.activity_article);
 
-        findViewById(R.id.tv_left).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.tv_article_left).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
